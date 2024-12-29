@@ -1,0 +1,114 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Username*"
+        android:textStyle="bold"
+        android:textSize="18dp"
+        android:layout_marginLeft="56dp"
+        android:layout_marginTop="70dp"/>
+
+    <EditText
+        android:id="@+id/etUsername"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="Username"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bio (optional)"
+        android:textStyle="bold"
+        android:textSize="18dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="56dp"/>
+
+    <EditText
+        android:id="@+id/etBio"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="Bio"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Age*"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:layout_marginTop="75dp"
+            android:layout_marginLeft="56dp"/>
+
+        <NumberPicker
+            android:id="@+id/npAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="30dp"
+            android:visibility="visible"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contacts (optional)"
+        android:textStyle="bold"
+        android:textSize="18dp"
+        android:layout_marginLeft="56dp"
+        android:layout_marginTop="10dp"/>
+
+    <EditText
+        android:id="@+id/etConEmail"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="E-mail"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"/>
+
+    <EditText
+        android:id="@+id/etConPhoneNumber"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="Phone number"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/buttonSave"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginLeft="40dp"/>
+
+        <Button
+            android:id="@+id/buttonReset"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginLeft="30dp"/>
+    </LinearLayout>
+</LinearLayout>

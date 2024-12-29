@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "64052913771",
+    "project_id": "handson-75475",
+    "storage_bucket": "handson-75475.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64052913771:android:75525f2e548e41d7e2732e",
+        "android_client_info": {
+          "package_name": "com.example.handson1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdWZ_wqjiNYmQY67JAQPIB37OKJaoufh4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
