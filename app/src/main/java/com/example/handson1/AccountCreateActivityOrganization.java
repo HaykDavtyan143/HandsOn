@@ -18,7 +18,6 @@ import java.util.List;
 public class AccountCreateActivityOrganization extends AppCompatActivity
 {
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {

@@ -26,9 +26,6 @@ public class MainActivity extends AppCompatActivity
     private Button btnBack;
     private TextView tvLS;
 
-
-    @SuppressLint("MissingInflatedId")
-
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);

@@ -21,7 +21,15 @@ public class LoginActivityPerson extends AppCompatActivity
     private Button btnLogin, btnSignUp, btnBack;
     private FirebaseAuth mAuth;
 
-    @SuppressLint("MissingInflatedId")
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            //stex intent himnakan page i vra
+        }
+    }
 
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -33,7 +41,6 @@ public class LoginActivityPerson extends AppCompatActivity
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
-        btnSignUp = findViewById(R.id.btnSignUp);
         btnBack = findViewById(R.id.buttonBack);
 
         btnSignUp.setOnClickListener(v -> signUpUser());

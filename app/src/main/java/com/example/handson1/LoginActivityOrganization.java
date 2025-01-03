@@ -17,7 +17,6 @@ public class LoginActivityOrganization extends AppCompatActivity
 
     private Button btnBack;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {

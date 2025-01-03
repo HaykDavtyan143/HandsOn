@@ -13,7 +13,6 @@ import androidx.core.view.WindowInsetsCompat;
 public class AccountCreateActivityPerson extends AppCompatActivity
 {
 
-    @SuppressLint("MissingInflatedId")
     @Override
 
     protected void onCreate(Bundle savedInstanceState)

@@ -17,7 +17,7 @@ public class SignupActivityOrganization extends AppCompatActivity
 
     private Button btnBack = findViewById(R.id.buttonBack);
 
-    @SuppressLint("MissingInflatedId")
+
     @Override
 
     protected void onCreate(Bundle savedInstanceState)
