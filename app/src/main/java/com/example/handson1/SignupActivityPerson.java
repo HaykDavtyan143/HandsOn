@@ -1,7 +1,9 @@
 package com.example.handson1;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
@@ -12,8 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-public class SignupActivityPerson extends AppCompatActivity {
+import java.util.HashMap;
+import java.util.Map;
+
+public class SignupActivityPerson extends AppCompatActivity
+{
     private EditText etEmail;
     private EditText etPassword;
     private Button btnSignUp, btnBack;
@@ -34,12 +41,12 @@ public class SignupActivityPerson extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+
         etEmail = findViewById(R.id.edittextEmail);
         etPassword = findViewById(R.id.edittextPassword);
         btnSignUp = findViewById(R.id.btnSignUp);
         btnBack = findViewById(R.id.buttonBack);
 
-        // Set up listeners
         btnSignUp.setOnClickListener(v -> signUpUser());
         btnBack.setOnClickListener(v -> finish());
     }
@@ -98,6 +105,27 @@ public class SignupActivityPerson extends AppCompatActivity {
                                             FirebaseUser user = mAuth.getCurrentUser();
                                             Toast.makeText(this, "Signup successful!", Toast.LENGTH_SHORT).show();
                                             Log.d("Signup", "User signed up: " + (user != null ? user.getEmail() : "null"));
+
+                                            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                                            Map<String, Object> userData = new HashMap<>();
+                                            userData.put("UserType", "Person");
+
+                                            db.collection("users").document(userId)
+                                                    .set(userData) // Overwrites the document if it exists
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        // Successfully written to Firestore
+                                                        Log.d("Firestore", "User details saved successfully.");
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        // Error writing to Firestore
+                                                        Log.e("Firestore", "Error saving user details: ", e);
+                                                    });
+
+                                            Intent intent = new Intent(SignupActivityPerson.this, LoginActivityPerson.class);
+                                            startActivity(intent);
+                                            finish();
                                         }
 
                                         else

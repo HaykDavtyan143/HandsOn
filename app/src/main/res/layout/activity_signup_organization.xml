@@ -31,14 +31,6 @@
         android:layout_marginTop="8dp" />
 
     <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Login"
-        android:layout_marginTop="16dp"
-        android:visibility="gone"/>
-
-    <Button
         android:id="@+id/btnSignUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -18,16 +18,17 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginActivityPerson extends AppCompatActivity
 {
     private EditText etEmail, etPassword;
-    private Button btnLogin, btnSignUp, btnBack;
+    private Button btnLogin, btnBack;
     private FirebaseAuth mAuth;
 
     @Override
-    public void onStart() {
+    public void onStart()
+    {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            //stex intent himnakan page i vra
+            // stex intent himnakan page i vra
         }
     }
 
@@ -43,7 +44,6 @@ public class LoginActivityPerson extends AppCompatActivity
         btnLogin = findViewById(R.id.btnLogin);
         btnBack = findViewById(R.id.buttonBack);
 
-        btnSignUp.setOnClickListener(v -> signUpUser());
         btnLogin.setOnClickListener(v -> loginUser());
 
         btnBack = findViewById(R.id.buttonBack);
@@ -54,36 +54,9 @@ public class LoginActivityPerson extends AppCompatActivity
             {
                 Intent intent = new Intent(LoginActivityPerson.this, MainActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
-    }
-
-    private void signUpUser()
-    {
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password))
-        {
-            Toast.makeText(LoginActivityPerson.this, "Please enter email and password", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful())
-                    {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(LoginActivityPerson.this, "Signup successful!", Toast.LENGTH_SHORT).show();
-                        Log.d("Signup", "User signed up: " + user.getEmail());
-                    }
-
-                    else
-                    {
-                        Toast.makeText(LoginActivityPerson.this, "Signup failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e("Signup", "Failed to sign up", task.getException());
-                    }
-                });
     }
 
     private void loginUser()

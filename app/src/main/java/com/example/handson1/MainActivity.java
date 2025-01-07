@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         Intent intent = new Intent (MainActivity.this, LoginActivityPerson.class);
                         startActivity(intent);
+                        finish();
                     }
                 });
 
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         Intent intent = new Intent (MainActivity.this, SignupActivityPerson.class);
                         startActivity(intent);
+                        finish();
                     }
                 });
             }
@@ -111,6 +113,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         Intent intent = new Intent (MainActivity.this, LoginActivityOrganization.class);
                         startActivity(intent);
+                        finish();
                     }
                 });
 
@@ -121,6 +124,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         Intent intent = new Intent(MainActivity.this, SignupActivityOrganization.class);
                         startActivity(intent);
+                        finish();
                     }
                 });
             }
