@@ -15,10 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class LoginActivityPerson extends AppCompatActivity
+public class LoginActivity extends AppCompatActivity
 {
     private EditText etEmail, etPassword;
-    private Button btnLogin, btnBack;
+    private Button btnLogin, btnSignUp;
     private FirebaseAuth mAuth;
 
     @Override
@@ -32,27 +32,27 @@ public class LoginActivityPerson extends AppCompatActivity
         }
     }
 
+
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_person);
+        setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
-        btnBack = findViewById(R.id.buttonBack);
+        btnSignUp = findViewById(R.id.btnSignUp);
 
         btnLogin.setOnClickListener(v -> loginUser());
 
-        btnBack = findViewById(R.id.buttonBack);
-
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        btnLogin.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent(LoginActivityPerson.this, MainActivity.class);
+                Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -66,7 +66,7 @@ public class LoginActivityPerson extends AppCompatActivity
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password))
         {
-            Toast.makeText(LoginActivityPerson.this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, "Please enter email and password", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -75,16 +75,16 @@ public class LoginActivityPerson extends AppCompatActivity
                     if (task.isSuccessful())
                     {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(LoginActivityPerson.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
                         Log.d("Login", "User logged in: " + user.getEmail());
 
-                        Intent intent = new Intent (LoginActivityPerson.this, AccountCreateActivityPerson.class);
+                        Intent intent = new Intent (LoginActivity.this, AccountCreateActivityPerson.class);
                         startActivity(intent);
                     }
 
                     else
                     {
-                        Toast.makeText(LoginActivityPerson.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         Log.e("Login", "Failed to log in", task.getException());
                     }
                 });

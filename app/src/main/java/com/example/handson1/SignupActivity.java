@@ -1,10 +1,10 @@
 package com.example.handson1;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,7 +18,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SignupActivityOrganization extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity
+{
     private EditText etEmail;
     private EditText etPassword;
     private Button btnSignUp, btnBack;
@@ -27,26 +28,36 @@ public class SignupActivityOrganization extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signup_person);
+        setContentView(R.layout.activity_signup);
 
         // Catch unexpected exceptions
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
             Log.e("AppCrash", "Unhandled exception: ", throwable);
             runOnUiThread(() ->
-                    Toast.makeText(SignupActivityOrganization.this, "Unexpected error occurred!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(SignupActivity.this, "Unexpected error occurred!", Toast.LENGTH_LONG).show()
             );
         });
 
         mAuth = FirebaseAuth.getInstance();
+
 
         etEmail = findViewById(R.id.edittextEmail);
         etPassword = findViewById(R.id.edittextPassword);
         btnSignUp = findViewById(R.id.btnSignUp);
         btnBack = findViewById(R.id.buttonBack);
 
-        // Set up listeners
         btnSignUp.setOnClickListener(v -> signUpUser());
         btnBack.setOnClickListener(v -> finish());
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void signUpUser()
@@ -108,7 +119,7 @@ public class SignupActivityOrganization extends AppCompatActivity {
                                             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                                             Map<String, Object> userData = new HashMap<>();
-                                            userData.put("UserType", "Organization");
+                                            userData.put("UserType", "Person");
 
                                             db.collection("users").document(userId)
                                                     .set(userData) // Overwrites the document if it exists
@@ -121,8 +132,7 @@ public class SignupActivityOrganization extends AppCompatActivity {
                                                         Log.e("Firestore", "Error saving user details: ", e);
                                                     });
 
-
-                                            Intent intent = new Intent(SignupActivityOrganization.this, LoginActivityOrganization.class);
+                                            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                                             startActivity(intent);
                                             finish();
                                         }
