@@ -20,16 +20,55 @@
         android:hint="Email"
         android:inputType="textEmailAddress"
         android:padding="12dp"
-        android:layout_marginTop="215dp"/>
+        android:layout_marginTop="175dp"/>
 
-    <EditText
-        android:id="@+id/edittextPassword"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="12dp"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/edittextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:paddingEnd="48dp"
+            android:padding="12dp"/>
+
+        <ImageButton
+            android:id="@+id/passwordToggle1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_eye_closed" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/edittextConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Confirm password"
+            android:inputType="textPassword"
+            android:paddingEnd="48dp"
+            android:padding="12dp"/>
+
+        <ImageButton
+            android:id="@+id/passwordToggle2"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_eye_closed" />
+    </RelativeLayout>
 
     <Button
         android:id="@+id/btnSignUp"

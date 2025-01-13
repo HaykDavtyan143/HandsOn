@@ -4,10 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +22,7 @@ public class LoginActivity extends AppCompatActivity
 {
     private EditText etEmail, etPassword;
     private Button btnLogin, btnSignUp;
+    private ImageButton passwordToggle;
     private FirebaseAuth mAuth;
 
     @Override
@@ -44,10 +48,12 @@ public class LoginActivity extends AppCompatActivity
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnSignUp = findViewById(R.id.btnSignUp);
+        passwordToggle = findViewById(R.id.password_Toggle);
+
 
         btnLogin.setOnClickListener(v -> loginUser());
 
-        btnLogin.setOnClickListener(new View.OnClickListener()
+        btnSignUp.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -57,8 +63,22 @@ public class LoginActivity extends AppCompatActivity
                 finish();
             }
         });
-    }
 
+        passwordToggle.setOnClickListener(v -> {
+            if (etPassword.getTransformationMethod() instanceof PasswordTransformationMethod)
+            {
+                etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                passwordToggle.setImageResource(R.drawable.ic_eye_open);
+            }
+            else
+            {
+                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                passwordToggle.setImageResource(R.drawable.ic_eye_closed);
+            }
+
+            etPassword.setSelection(etPassword.getText().length());
+        });
+    }
     private void loginUser()
     {
         String email = etEmail.getText().toString().trim();
