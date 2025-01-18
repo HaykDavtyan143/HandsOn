@@ -53,7 +53,6 @@ public class SignupActivity extends AppCompatActivity
         passwordToggle1 = findViewById(R.id.passwordToggle1);
         passwordToggle2=findViewById(R.id.passwordToggle2);
         btnSignUp.setOnClickListener(v -> signUpUser());
-        btnBack.setOnClickListener(v -> finish());
 
 
         passwordToggle1.setOnClickListener(v -> {
