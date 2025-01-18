@@ -1,5 +1,6 @@
 package com.example.handson1;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,14 +26,16 @@ import java.util.Map;
 
 public class SignupActivity extends AppCompatActivity
 {
+    private int type;
     private EditText etEmail;
-    private EditText etPassword, etConfirmPassword;
+    private EditText etPassword, etConfirmPassword, etUsername;
     private Button btnSignUp, btnBack;
+    private RadioGroup check;
     private ImageButton passwordToggle1, passwordToggle2;
     private FirebaseAuth mAuth;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
@@ -44,15 +49,19 @@ public class SignupActivity extends AppCompatActivity
 
         mAuth = FirebaseAuth.getInstance();
 
+        type = 0;
 
         etEmail = findViewById(R.id.edittextEmail);
         etPassword = findViewById(R.id.edittextPassword);
         etConfirmPassword = findViewById(R.id.edittextConfirmPassword);
+        etUsername = findViewById(R.id.edittextUsername);
         btnSignUp = findViewById(R.id.btnSignUp);
         btnBack = findViewById(R.id.buttonBack);
+        check = findViewById(R.id.check);
         passwordToggle1 = findViewById(R.id.passwordToggle1);
         passwordToggle2=findViewById(R.id.passwordToggle2);
         btnSignUp.setOnClickListener(v -> signUpUser());
+
 
 
         passwordToggle1.setOnClickListener(v -> {
@@ -70,12 +79,25 @@ public class SignupActivity extends AppCompatActivity
             etPassword.setSelection(etPassword.getText().length());
         });
 
+        check.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.person)
+            {
+                type = 1;
+            }
+
+            else if (checkedId == R.id.organization)
+            {
+                type = 2;
+            }
+        });
+
         passwordToggle2.setOnClickListener(v -> {
             if (etConfirmPassword.getTransformationMethod() instanceof PasswordTransformationMethod)
             {
                 etConfirmPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
                 passwordToggle2.setImageResource(R.drawable.ic_eye_open);
             }
+
             else
             {
                 etConfirmPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
@@ -85,7 +107,8 @@ public class SignupActivity extends AppCompatActivity
             etConfirmPassword.setSelection(etConfirmPassword.getText().length());
         });
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        btnBack.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View v)
             {
@@ -105,20 +128,27 @@ public class SignupActivity extends AppCompatActivity
             return;
         }
 
+        String username = etUsername.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-        // Validation checks
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password))
+        if (type == 0)
         {
-            Toast.makeText(this, "Please enter email and password!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select account type!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(username))
+        {
+            Toast.makeText(this, "Please enter email, username and password!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && TextUtils.isEmpty(confirmPassword))
         {
             Toast.makeText(this, "Please confirm the password", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches())
@@ -162,17 +192,26 @@ public class SignupActivity extends AppCompatActivity
                                                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                                                 FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-                                                Map<String, Object> userData = new HashMap<>();
-                                                userData.put("UserType", "Person");
+                                                Map<String, Object> User = new HashMap<>();
+                                                User.put("Email", email);
+                                                User.put("Password", password);
+                                                if (type == 1)
+                                                {
+                                                    User.put("Type", "Person");
+                                                }
 
-                                                db.collection("users").document(userId)
-                                                        .set(userData) // Overwrites the document if it exists
+                                                else if (type == 2)
+                                                {
+                                                    User.put("Type", "Organization");
+                                                }
+                                                User.put("Username", username);
+
+
+                                                db.collection("users").add(User) // Overwrites the document if it exists
                                                         .addOnSuccessListener(aVoid -> {
-                                                            // Successfully written to Firestore
-                                                            Log.d("Firestore", "User details saved successfully.");
+                                                            Log.d("Firestore", "User saved successfully.");
                                                         })
                                                         .addOnFailureListener(e -> {
-                                                            // Error writing to Firestore
                                                             Log.e("Firestore", "Error saving user details: ", e);
                                                         });
 

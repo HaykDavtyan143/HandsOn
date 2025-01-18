@@ -22,6 +22,14 @@
         android:padding="12dp"
         android:layout_marginTop="175dp"/>
 
+    <EditText
+        android:id="@+id/edittextUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Username"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,10 +78,33 @@
             android:src="@drawable/ic_eye_closed" />
     </RelativeLayout>
 
+    <RadioGroup
+        android:id="@+id/check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/person"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Person"
+            android:textStyle="bold"
+            android:layout_marginRight="10dp"/>
+
+        <RadioButton
+            android:id="@+id/organization"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Organization"
+            android:textStyle="bold"/>
+    </RadioGroup>
+
     <Button
         android:id="@+id/btnSignUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sign Up"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:textStyle="bold"/>
 </LinearLayout>
