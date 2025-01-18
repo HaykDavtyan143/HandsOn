@@ -32,29 +32,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/post_description" />
 
-    <ImageButton
+    <Button
         android:id="@+id/comment_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:padding="5dp"
-        android:contentDescription="Comment"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:scaleType="fitCenter"
+        android:text="Comment"
         app:layout_constraintTop_toBottomOf="@id/comment_count"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_comment" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <ImageButton
-        android:id="@+id/like_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="8dp"
-        android:padding="5dp"
-        android:contentDescription="Comment"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:scaleType="fitCenter"
-        app:layout_constraintTop_toBottomOf="@id/comment_count"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_comment" />
 </androidx.constraintlayout.widget.ConstraintLayout>

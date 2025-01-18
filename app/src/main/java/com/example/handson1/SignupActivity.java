@@ -193,6 +193,7 @@ public class SignupActivity extends AppCompatActivity
                                                 FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                                                 Map<String, Object> User = new HashMap<>();
+
                                                 User.put("Email", email);
                                                 User.put("Password", password);
                                                 if (type == 1)
@@ -204,10 +205,10 @@ public class SignupActivity extends AppCompatActivity
                                                 {
                                                     User.put("Type", "Organization");
                                                 }
+
                                                 User.put("Username", username);
 
-
-                                                db.collection("users").add(User) // Overwrites the document if it exists
+                                                db.collection("users").add(User)
                                                         .addOnSuccessListener(aVoid -> {
                                                             Log.d("Firestore", "User saved successfully.");
                                                         })

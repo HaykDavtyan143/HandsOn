@@ -1,11 +1,11 @@
 package com.example.handson1;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -75,8 +75,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     static class FeedViewHolder extends RecyclerView.ViewHolder {
         TextView title, description, commentCount;
-        ImageButton commentButton;
+        Button commentButton;
 
+
+        @SuppressLint("WrongViewCast")
         public FeedViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.post_title);
