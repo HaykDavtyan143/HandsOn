@@ -80,7 +80,7 @@ public class SignupActivity extends AppCompatActivity
         });
 
         check.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.person)
+            if (checkedId == R.id.volunteer)
             {
                 type = 1;
             }
@@ -198,10 +198,9 @@ public class SignupActivity extends AppCompatActivity
                                                 User.put("Password", password);
                                                 if (type == 1)
                                                 {
-                                                    User.put("Type", "Person");
+                                                    User.put("Type", "Volunteer");
                                                 }
-
-                                                else if (type == 2)
+                                                  else if (type == 2)
                                                 {
                                                     User.put("Type", "Organization");
                                                 }

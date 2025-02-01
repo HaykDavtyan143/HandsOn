@@ -85,10 +85,10 @@
         android:orientation="horizontal">
 
         <RadioButton
-            android:id="@+id/person"
+            android:id="@+id/volunteer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Person"
+            android:text="Volunteer"
             android:textStyle="bold"
             android:layout_marginRight="10dp"/>
 
