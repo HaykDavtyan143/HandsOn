@@ -24,7 +24,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentsFragment extends Fragment {
+public class CommentsFragment extends Fragment
+{
 
     private RecyclerView commentsRecyclerView;
     private EditText commentInput;
@@ -46,7 +47,6 @@ public class CommentsFragment extends Fragment {
     public CommentsFragment() {
     }
 
-    @SuppressLint({"MissingInflatedId", "WrongViewCast"})
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -61,11 +61,13 @@ public class CommentsFragment extends Fragment {
         commentsRecyclerView.setAdapter(commentsAdapter);
 
         // Get postId from arguments
-        if (getArguments() != null) {
+        if (getArguments() != null)
+        {
             postId = getArguments().getString(ARG_POST_ID);
         }
 
-        if (postId == null) {
+        if (postId == null)
+        {
             Log.e("CommentsFragment", "Post ID is null!");
             return view;
         }

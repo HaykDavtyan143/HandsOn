@@ -53,6 +53,7 @@ public class AddPostActivity extends AppCompatActivity {
         post.put("title", title);
         post.put("description", description);
         post.put("comments", new ArrayList<String>());
+        post.put("likes", 0);
 
         // Add to Firestore
         db.collection("posts")

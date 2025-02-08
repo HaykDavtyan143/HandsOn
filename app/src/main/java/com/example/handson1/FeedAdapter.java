@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -23,7 +24,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 {
     private Context context;
     private List<Post> posts;
-
+    private String postId;
+    private static final String ARG_POST_ID = "post_id";
     public FeedAdapter(Context context, List<Post> posts)
     {
         this.context = context;
@@ -44,7 +46,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         Post post = posts.get(position);
         holder.title.setText(post.getTitle());
         holder.description.setText(post.getDescription());
-        holder.commentCount.setText(post.getCommentsCount() + " comments");
+        holder.commentCount.setText(String.valueOf(post.getCommentsCount()));
+        holder.likeCount.setText(String.valueOf(post.getLikes()));
 
         holder.commentButton.setOnClickListener(v -> {
             if (context instanceof AppCompatActivity) {
@@ -66,6 +69,36 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             }
         });
 
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    DocumentReference postRef = db.collection("posts").document(post.getId());
+
+
+    postId = ARG_POST_ID;
+
+    holder.likeButton.setOnClickListener(v -> {
+        if (!post.getIsLiked())
+        {
+            holder.likeButton.setImageResource(R.drawable.ic_liked);
+            post.setIsLiked(true);
+            post.setLikes(post.getLikes() + 1);
+            holder.likeCount.setText(String.valueOf(post.getLikes()));
+
+            postRef.update("likes", FieldValue.increment(1))
+                    .addOnSuccessListener(aVoid -> Log.d("Firestore", "Likes updated successfully"))
+                    .addOnFailureListener(e -> Log.e("Firestore", "Error updating likes", e));
+        }
+        else
+        {
+            holder.likeButton.setImageResource(R.drawable.ic_notliked);
+            post.setIsLiked(false);
+            post.setLikes(post.getLikes() - 1);
+            holder.likeCount.setText(String.valueOf(post.getLikes()));
+
+            postRef.update("likes", FieldValue.increment(-1))
+                    .addOnSuccessListener(aVoid -> Log.d("Firestore", "Likes updated successfully"))
+                    .addOnFailureListener(e -> Log.e("Firestore", "Error updating likes", e));
+        }
+    });
 
 
     }
@@ -77,8 +110,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     }
     static class FeedViewHolder extends RecyclerView.ViewHolder
     {
-        TextView title, description, commentCount;
-        ImageButton commentButton;
+        TextView title, description, commentCount, likeCount;
+        ImageButton commentButton, likeButton;
 
 
         @SuppressLint("WrongViewCast")
@@ -88,7 +121,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             title = itemView.findViewById(R.id.post_title);
             description = itemView.findViewById(R.id.post_description);
             commentCount = itemView.findViewById(R.id.comment_count);
+            likeCount = itemView.findViewById(R.id.like_count);
             commentButton = itemView.findViewById(R.id.comment_button);
+            likeButton = itemView.findViewById(R.id.like_button);
         }
     }
 }

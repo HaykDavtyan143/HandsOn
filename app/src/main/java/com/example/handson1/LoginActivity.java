@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginActivity extends AppCompatActivity
 {
     private EditText etEmail, etPassword;
-    private Button btnLogin, btnSignUp;
+    private Button btnLogin, btnSignUp, btnTestUser;
     private ImageButton passwordToggle;
     private FirebaseAuth mAuth;
 
@@ -41,6 +41,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
 
+
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -52,10 +53,22 @@ public class LoginActivity extends AppCompatActivity
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnSignUp = findViewById(R.id.btnSignUp);
+        btnTestUser = findViewById(R.id.btntestUser);
         passwordToggle = findViewById(R.id.password_Toggle);
 
 
         btnLogin.setOnClickListener(v -> loginUser());
+
+        btnTestUser.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(LoginActivity.this, FeedActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         btnSignUp.setOnClickListener(new View.OnClickListener()
         {

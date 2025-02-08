@@ -10,6 +10,8 @@ public class Post
     private String description;
     private List<String> comments;
 
+    private boolean isLiked = false;
+
     private int likes = 0;
 
     public Post() {}
@@ -84,5 +86,15 @@ public class Post
     public int getCommentsCount()
     {
         return comments != null ? comments.size() : 0;
+    }
+
+    public boolean getIsLiked ()
+    {
+        return isLiked;
+    }
+
+    public void setIsLiked (boolean isLiked)
+    {
+        this.isLiked = isLiked;
     }
 }
