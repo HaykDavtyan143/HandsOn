@@ -2,13 +2,14 @@ package com.example.handson1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Post
 {
     private String id;
     private String title;
     private String description;
-    private List<String> comments;
+    private List<Map<String, Object>> comments;
 
     private boolean isLiked = false;
 
@@ -53,13 +54,12 @@ public class Post
         this.description = description;
     }
 
-    public List<String> getComments()
+    public List<Map<String, Object>> getComments()
     {
         return comments;
     }
 
-    public void setComments(List<String> comments)
-    {
+    public void setComments(List<Map<String, Object>> comments) {
         this.comments = comments;
     }
 
@@ -73,14 +73,14 @@ public class Post
         this.likes = likes;
     }
 
-    public void addComment(String comment)
+    public void addComment(Object comment)
     {
         if (comments == null)
         {
             comments = new ArrayList<>();
         }
 
-        comments.add(comment);
+        comments.add((Map<String, Object>) comment);
     }
 
     public int getCommentsCount()

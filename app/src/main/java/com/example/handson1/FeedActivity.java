@@ -41,7 +41,6 @@ public class FeedActivity extends AppCompatActivity
         btnMessages = findViewById(R.id.ib_messages);
         btnProfile = findViewById(R.id.ib_profile);
 
-        uploadPosts();
         fetchPostsFromFirestore();
 
         btnHome.setOnClickListener(v -> {
@@ -74,41 +73,53 @@ public class FeedActivity extends AppCompatActivity
         });
     }
 
-    private void fetchPostsFromFirestore()
-    {
+    private void fetchPostsFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("posts")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     posts.clear();
-                    for (QueryDocumentSnapshot document : querySnapshot)
-                    {
-                        Post post = document.toObject(Post.class);
-                        post.setId(document.getId());
-                        posts.add(post);
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        try {
+                            // Convert the document to a Post object
+                            Post post = document.toObject(Post.class);
+
+                            // Ensure the post object has a valid Firestore document ID
+                            if (document.getId() != null) {
+                                post.setId(document.getId());
+                            } else {
+                                Log.e("FeedActivity", "Post document ID is null: " + document.getData());
+                                continue; // Skip this post if ID is null
+                            }
+
+                            // Handle the comments field if it's present
+                            if (document.contains("comments"))
+                            {
+                                Object commentsObject = document.get("comments");
+                                if (commentsObject instanceof List)
+                                {
+                                    post.setComments((List<Map<String, Object>>) commentsObject);
+                                }
+                                else
+                                {
+                                    post.setComments(new ArrayList<>());
+                                    Log.e("FeedActivity", "Unexpected comments format: " + commentsObject);
+                                }
+                            }
+
+                            posts.add(post);
+                        } catch (Exception e)
+                        {
+                            Log.e("FeedActivity", "Error processing post: " + document.getId(), e);
+                        }
                     }
+
+                    // Notify the adapter that the data has changed
                     feedAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> Log.e("FeedActivity", "Error fetching posts", e));
     }
 
-    private void uploadPosts()
-    {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-       // List<Map<String, Object>> dummyPosts = new ArrayList<>();
-        //dummyPosts.add(createPostMap("Beach Cleanup", "Join us for a beach cleanup event!"));
-        //dummyPosts.add(createPostMap("Food Drive", "Help us distribute food to those in need."));
-        //dummyPosts.add(createPostMap("Tree Planting", "Be a part of our tree-planting initiative."));
-
-        //for (Map<String, Object> post : dummyPosts)
-        //{
-          //  db.collection("posts")
-          //          .add(post)
-          //          .addOnSuccessListener(documentReference -> Log.d("UploadPosts", "Post added: " + documentReference.getId()))
-            //        .addOnFailureListener(e -> Log.w("UploadPosts", "Error adding post", e));
-            //}
-    }
     private Map<String, Object> createPostMap(String title, String description)
     {
         Map<String, Object> postMap = new HashMap<>();

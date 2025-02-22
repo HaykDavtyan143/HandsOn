@@ -32,35 +32,39 @@ public class AddPostActivity extends AppCompatActivity {
         buttonAddPost.setOnClickListener(v -> addPostToFirestore());
     }
 
-    private void addPostToFirestore() {
+    private void addPostToFirestore()
+    {
         String title = editTextTitle.getText().toString().trim();
         String description = editTextDescription.getText().toString().trim();
 
-        if (TextUtils.isEmpty(title)) {
+        if (TextUtils.isEmpty(title))
+        {
             editTextTitle.setError("Title is required");
             return;
         }
 
-        if (TextUtils.isEmpty(description)) {
+        if (TextUtils.isEmpty(description))
+        {
             editTextDescription.setError("Description is required");
             return;
         }
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Create a new post object
+        Map<String, Object> likedBy = new HashMap<>();
+
         Map<String, Object> post = new HashMap<>();
         post.put("title", title);
         post.put("description", description);
         post.put("comments", new ArrayList<String>());
         post.put("likes", 0);
+        post.put("likedBy", likedBy);
 
-        // Add to Firestore
         db.collection("posts")
                 .add(post)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Post added successfully", Toast.LENGTH_SHORT).show();
-                    finish(); // Close the activity and return to the previous one
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to add post: " + e.getMessage(), Toast.LENGTH_LONG).show();

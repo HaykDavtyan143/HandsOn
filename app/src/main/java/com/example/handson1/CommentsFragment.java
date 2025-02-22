@@ -23,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CommentsFragment extends Fragment
 {
@@ -31,7 +32,7 @@ public class CommentsFragment extends Fragment
     private EditText commentInput;
     private Button postCommentButton;
     private CommentsAdapter commentsAdapter;
-    private List<String> comments = new ArrayList<>();
+    private List<Map<String, Object>> comments = new ArrayList<>();
     private String postId;
 
     private static final String ARG_POST_ID = "post_id";
@@ -44,7 +45,8 @@ public class CommentsFragment extends Fragment
         return fragment;
     }
 
-    public CommentsFragment() {
+    public CommentsFragment()
+    {
     }
 
     @Nullable
@@ -90,13 +92,13 @@ public class CommentsFragment extends Fragment
 
         // Add new comment
         postCommentButton.setOnClickListener(v -> {
-            String newComment = commentInput.getText().toString().trim();
-            if (!TextUtils.isEmpty(newComment)) {
+            Object newComment = commentInput.getText().toString().trim();
+            if (!TextUtils.isEmpty((String)newComment)) {
                 db.collection("posts")
                         .document(postId)
                         .update("comments", FieldValue.arrayUnion(newComment))
                         .addOnSuccessListener(aVoid -> {
-                            comments.add(newComment);
+                            comments.add((Map<String, Object>) newComment);
                             commentsAdapter.notifyItemInserted(comments.size() - 1);
                             commentsRecyclerView.scrollToPosition(comments.size() - 1);
                             commentInput.setText("");
