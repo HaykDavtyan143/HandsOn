@@ -21,7 +21,7 @@ public class FeedActivity extends AppCompatActivity
 {
     private RecyclerView recyclerView;
     private FeedAdapter feedAdapter;
-    private List<Post> posts = new ArrayList<>();
+    protected List<Post> posts = new ArrayList<>();
 
     private ImageButton btnHome, btnSearch, btnAddPost, btnMessages, btnProfile;
 
@@ -73,59 +73,60 @@ public class FeedActivity extends AppCompatActivity
         });
     }
 
-    private void fetchPostsFromFirestore() {
+    public void fetchPostsFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("posts")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     posts.clear();
+
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         try {
-                            // Convert the document to a Post object
                             Post post = document.toObject(Post.class);
 
-                            // Ensure the post object has a valid Firestore document ID
                             if (document.getId() != null) {
                                 post.setId(document.getId());
                             } else {
                                 Log.e("FeedActivity", "Post document ID is null: " + document.getData());
-                                continue; // Skip this post if ID is null
+                                continue;
                             }
 
-                            // Handle the comments field if it's present
-                            if (document.contains("comments"))
-                            {
-                                Object commentsObject = document.get("comments");
-                                if (commentsObject instanceof List)
-                                {
-                                    post.setComments((List<Map<String, Object>>) commentsObject);
-                                }
-                                else
-                                {
-                                    post.setComments(new ArrayList<>());
-                                    Log.e("FeedActivity", "Unexpected comments format: " + commentsObject);
-                                }
+                            Object commentsObject = document.get("comments");
+
+                            if (commentsObject instanceof Map) {
+                                HashMap<String, Object> fixedComments = new HashMap<>((Map<String, Object>) commentsObject);
+                                post.setComments(fixedComments);
+                            } else {
+                                post.setComments(new HashMap<>());
+                                Log.e("FeedActivity", "Unexpected comments format: " + commentsObject);
                             }
+
+                            Log.d("FeedActivity", "Fetched post ID: " + post.getId() + ", Comments: " + post.getComments());
 
                             posts.add(post);
-                        } catch (Exception e)
-                        {
+
+                        } catch (Exception e) {
                             Log.e("FeedActivity", "Error processing post: " + document.getId(), e);
                         }
                     }
 
-                    // Notify the adapter that the data has changed
-                    feedAdapter.notifyDataSetChanged();
+                    runOnUiThread(() -> {
+                        feedAdapter.notifyDataSetChanged();
+                    });
+
                 })
                 .addOnFailureListener(e -> Log.e("FeedActivity", "Error fetching posts", e));
     }
+
+
+
 
     private Map<String, Object> createPostMap(String title, String description)
     {
         Map<String, Object> postMap = new HashMap<>();
         postMap.put("title", title);
         postMap.put("description", description);
-        postMap.put("comments", new ArrayList<String>());
+        postMap.put("comments", new HashMap<String, Object>());
         postMap.put("likes", 0);
         return postMap;
     }

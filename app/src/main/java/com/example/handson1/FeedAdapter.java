@@ -16,15 +16,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder> {
     private Context context;
     private List<Post> posts;
+
+    private RecyclerView recyclerView;
 
     FirebaseAuth auth;
     FirebaseUser currentUser;
@@ -53,13 +57,11 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         holder.commentCount.setText(String.valueOf(post.getCommentsCount()));
         holder.likeCount.setText(String.valueOf(post.getLikes()));
 
-        // Check if post ID is valid
         if (post.getId() == null || post.getId().isEmpty()) {
             Log.e("FeedAdapter", "Invalid Post ID: " + post.getTitle());
-            return; // Avoid continuing if there's no valid post ID
+            return;
         }
 
-        // Open CommentsFragment when the comment button is clicked
         holder.commentButton.setOnClickListener(v -> {
             if (context instanceof AppCompatActivity) {
                 AppCompatActivity activity = (AppCompatActivity) context;
@@ -81,47 +83,108 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference postRef = db.collection("posts").document(post.getId());
-        DocumentReference likeRef = postRef.collection("likedBy").document(userId);
 
-        likeRef.get().addOnCompleteListener(task -> {
-
-            if (task.isSuccessful() && task.getResult().exists())
+        postRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful())
             {
-                post.setIsLiked(true);
-                holder.likeButton.setImageResource(R.drawable.ic_liked);
-            }
+                DocumentSnapshot document = task.getResult();
 
-            else
-            {
-                post.setIsLiked(false);
-                holder.likeButton.setImageResource(R.drawable.ic_notliked);
+                if (document.exists())
+                {
+                    Map<String, Object> likedByMap = (Map<String, Object>) document.get("likedBy");
+                    if (likedByMap != null && likedByMap.containsKey(userId))
+                    {
+                        holder.likeButton.setImageResource(R.drawable.ic_liked);
+                    }
+
+                    else
+                    {
+                        holder.likeButton.setImageResource(R.drawable.ic_notliked);
+                    }
+                }
             }
         });
 
         holder.likeButton.setOnClickListener(v -> {
-            likeRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult().exists())
-                {
-                    likeRef.delete().addOnSuccessListener(aVoid -> {
-                        postRef.update("likes", FieldValue.increment(-1));
-                        post.setLikes(post.getLikes() - 1);
-                        holder.likeCount.setText(String.valueOf(post.getLikes()));
-                        holder.likeButton.setImageResource(R.drawable.ic_notliked);
-                    });
-                }
-                else
-                {
+            postRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists())
+                    {
+                        Map<String, Object> likedByMap = (Map<String, Object>) document.get("likedBy");
+                        if (likedByMap != null && likedByMap.containsKey(userId))
+                        {
+                            Map<String, Object> updates = new HashMap<>();
+                            updates.put("likedBy." + userId, FieldValue.delete());
 
-                    likeRef.set(new HashMap<>()).addOnSuccessListener(aVoid -> {
-                        postRef.update("likes", FieldValue.increment(1));
-                        post.setLikes(post.getLikes() + 1);
-                        holder.likeCount.setText(String.valueOf(post.getLikes()));
-                        holder.likeButton.setImageResource(R.drawable.ic_liked);
-                    });
+                            postRef.update(updates)
+                                    .addOnSuccessListener(aVoid -> {
+                                        postRef.update("likes", FieldValue.increment(-1));
+                                        post.setLikes(post.getLikes() - 1);
+                                        holder.likeCount.setText(String.valueOf(post.getLikes()));
+                                        holder.likeButton.setImageResource(R.drawable.ic_notliked);
+                                    });
+                        }
+
+                        else
+                        {
+                            Map<String, Object> updates = new HashMap<>();
+                            updates.put("likedBy." + userId, true);
+
+                            postRef.update(updates)
+                                    .addOnSuccessListener(aVoid -> {
+                                        postRef.update("likes", FieldValue.increment(1));
+                                        post.setLikes(post.getLikes() + 1);
+                                        holder.likeCount.setText(String.valueOf(post.getLikes()));
+                                        holder.likeButton.setImageResource(R.drawable.ic_liked);
+                            });
+                        }
+                    }
                 }
             });
         });
     }
+
+    public FeedAdapter () {}
+
+    public void updateCommentCountForPost(String postId, int newCommentCount) {
+        for (int i = 0; i < posts.size(); i++) {
+            Post post = posts.get(i);
+            if (post.getId().equals(postId)) {
+
+                RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(i);
+                if (viewHolder != null) {
+                    FeedAdapter.FeedViewHolder holder = (FeedAdapter.FeedViewHolder) viewHolder;
+                    holder.commentCount.setText(String.valueOf(newCommentCount));
+                }
+                break;
+            }
+        }
+    }
+
+    public int getCommentCount(String postId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference postRef = db.collection("posts").document(postId);
+
+        final int[] commentCount = {0};
+
+        postRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Map<String, Object> commentsMap = (Map<String, Object>) document.get("comments");
+                    if (commentsMap != null) {
+                        commentCount[0] = commentsMap.size();
+                    }
+                }
+            } else {
+                Log.e("FeedAdapter", "Error getting post document: ", task.getException());
+            }
+        });
+
+        return commentCount[0];
+    }
+
 
     @Override
     public int getItemCount() {

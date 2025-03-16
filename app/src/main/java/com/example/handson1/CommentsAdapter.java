@@ -8,14 +8,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder> {
 
-    private List<Map<String, Object>> comments;
+    private HashMap<String, Object> comments;
 
-    public CommentsAdapter(List<Map<String, Object>> comments) {
+    public CommentsAdapter(HashMap<String, Object> comments)
+    {
         this.comments = comments;
     }
 
@@ -28,7 +31,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
-        holder.commentText.setText(String.valueOf(comments.get(position)));
+        String commentKey = (String) comments.keySet().toArray()[position];
+        String commentText = (String) comments.get(commentKey);
+
+        holder.commentText.setText(commentText);
     }
 
     @Override
@@ -45,3 +51,5 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         }
     }
 }
+
+

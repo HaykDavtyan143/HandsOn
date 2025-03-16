@@ -1,6 +1,7 @@
 package com.example.handson1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ public class Post
     private String id;
     private String title;
     private String description;
-    private List<Map<String, Object>> comments;
+    private HashMap<String, Object> comments;
 
     private boolean isLiked = false;
 
@@ -21,7 +22,7 @@ public class Post
     {
         this.title = title;
         this.description = description;
-        this.comments = new ArrayList<>();
+        this.comments = new HashMap<>();
     }
 
     public String getId()
@@ -54,12 +55,12 @@ public class Post
         this.description = description;
     }
 
-    public List<Map<String, Object>> getComments()
+    public HashMap<String, Object> getComments()
     {
         return comments;
     }
 
-    public void setComments(List<Map<String, Object>> comments) {
+    public void setComments(HashMap<String, Object> comments) {
         this.comments = comments;
     }
 
@@ -77,10 +78,10 @@ public class Post
     {
         if (comments == null)
         {
-            comments = new ArrayList<>();
+            comments = new HashMap<>();
         }
 
-        comments.add((Map<String, Object>) comment);
+        comments.put("", comment);
     }
 
     public int getCommentsCount()

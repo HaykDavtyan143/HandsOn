@@ -2,7 +2,6 @@ package com.example.handson1;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -11,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +17,8 @@ public class AddPostActivity extends AppCompatActivity {
 
     private EditText editTextTitle, editTextDescription;
     private Button buttonAddPost;
+
+    private FeedActivity feedActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +28,8 @@ public class AddPostActivity extends AppCompatActivity {
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
         buttonAddPost = findViewById(R.id.button_add_post);
+
+        feedActivity = new FeedActivity();
 
         buttonAddPost.setOnClickListener(v -> addPostToFirestore());
     }
@@ -52,11 +54,12 @@ public class AddPostActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         Map<String, Object> likedBy = new HashMap<>();
-
+        Map<String, Object> comments = new HashMap<>();
         Map<String, Object> post = new HashMap<>();
+
         post.put("title", title);
         post.put("description", description);
-        post.put("comments", new ArrayList<String>());
+        post.put("comments", comments);
         post.put("likes", 0);
         post.put("likedBy", likedBy);
 
@@ -69,5 +72,7 @@ public class AddPostActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to add post: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
+
+        feedActivity.fetchPostsFromFirestore();
     }
 }
