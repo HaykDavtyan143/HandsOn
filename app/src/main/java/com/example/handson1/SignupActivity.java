@@ -15,8 +15,11 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -163,7 +166,6 @@ public class SignupActivity extends AppCompatActivity
             return;
         }
 
-        // Check if the email already exists
         mAuth.fetchSignInMethodsForEmail(email)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful())
@@ -180,13 +182,12 @@ public class SignupActivity extends AppCompatActivity
                         {
                             if (confirmPassword.equals(password))
                             {
-                                // Create a new user
                                 mAuth.createUserWithEmailAndPassword(email, password)
                                         .addOnCompleteListener(signupTask -> {
                                             if (signupTask.isSuccessful())
                                             {
                                                 FirebaseUser user = mAuth.getCurrentUser();
-                                                Toast.makeText(this, "Signup successful!", Toast.LENGTH_SHORT).show();
+                                                sendVerificationEmail();
                                                 Log.d("Signup", "User signed up: " + (user != null ? user.getEmail() : "null"));
 
                                                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -200,7 +201,7 @@ public class SignupActivity extends AppCompatActivity
                                                 {
                                                     User.put("Type", "Volunteer");
                                                 }
-                                                  else if (type == 2)
+                                                else if (type == 2)
                                                 {
                                                     User.put("Type", "Organization");
                                                 }
@@ -216,6 +217,7 @@ public class SignupActivity extends AppCompatActivity
                                                         });
 
                                                 Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                                                intent.putExtra("fromSignup", true);
                                                 startActivity(intent);
                                                 finish();
                                             }
@@ -244,4 +246,24 @@ public class SignupActivity extends AppCompatActivity
                     Toast.makeText(this, "Firebase operation failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
+    private void sendVerificationEmail()
+    {
+        mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task)
+            {
+                if (task.isSuccessful())
+                {
+                    Toast.makeText(SignupActivity.this, "Email has been sent to your email address", Toast.LENGTH_SHORT).show();
+                }
+
+                else
+                {
+                    Toast.makeText(SignupActivity.this, "Failed to send verification email", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
 }

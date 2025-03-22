@@ -63,14 +63,16 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         }
 
         holder.commentButton.setOnClickListener(v -> {
+            Log.d("FeedAdapter", "Context: " + context.getClass().getSimpleName());
             if (context instanceof AppCompatActivity) {
                 AppCompatActivity activity = (AppCompatActivity) context;
 
-                try {
+                try
+                {
                     CommentsFragment commentsFragment = CommentsFragment.newInstance(post.getId());
                     activity.getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.fragment_container, commentsFragment)
+                            .add(R.id.fragment_container, commentsFragment)
                             .addToBackStack(null)
                             .commit();
                 } catch (Exception e) {
@@ -85,20 +87,14 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         DocumentReference postRef = db.collection("posts").document(post.getId());
 
         postRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful())
-            {
+            if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
 
-                if (document.exists())
-                {
+                if (document.exists()) {
                     Map<String, Object> likedByMap = (Map<String, Object>) document.get("likedBy");
-                    if (likedByMap != null && likedByMap.containsKey(userId))
-                    {
+                    if (likedByMap != null && likedByMap.containsKey(userId)) {
                         holder.likeButton.setImageResource(R.drawable.ic_liked);
-                    }
-
-                    else
-                    {
+                    } else {
                         holder.likeButton.setImageResource(R.drawable.ic_notliked);
                     }
                 }
@@ -109,11 +105,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             postRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (document.exists())
-                    {
+                    if (document.exists()) {
                         Map<String, Object> likedByMap = (Map<String, Object>) document.get("likedBy");
-                        if (likedByMap != null && likedByMap.containsKey(userId))
-                        {
+                        if (likedByMap != null && likedByMap.containsKey(userId)) {
                             Map<String, Object> updates = new HashMap<>();
                             updates.put("likedBy." + userId, FieldValue.delete());
 
@@ -124,10 +118,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                                         holder.likeCount.setText(String.valueOf(post.getLikes()));
                                         holder.likeButton.setImageResource(R.drawable.ic_notliked);
                                     });
-                        }
-
-                        else
-                        {
+                        } else {
                             Map<String, Object> updates = new HashMap<>();
                             updates.put("likedBy." + userId, true);
 
@@ -137,7 +128,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                                         post.setLikes(post.getLikes() + 1);
                                         holder.likeCount.setText(String.valueOf(post.getLikes()));
                                         holder.likeButton.setImageResource(R.drawable.ic_liked);
-                            });
+                                    });
                         }
                     }
                 }
@@ -145,7 +136,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         });
     }
 
-    public FeedAdapter () {}
+    @Override
+    public int getItemCount() {
+        return posts.size();
+    }
 
     public void updateCommentCountForPost(String postId, int newCommentCount) {
         for (int i = 0; i < posts.size(); i++) {
@@ -161,6 +155,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             }
         }
     }
+
 
     public int getCommentCount(String postId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -183,12 +178,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         });
 
         return commentCount[0];
-    }
-
-
-    @Override
-    public int getItemCount() {
-        return posts.size();
     }
 
     static class FeedViewHolder extends RecyclerView.ViewHolder {

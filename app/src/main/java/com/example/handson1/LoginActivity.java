@@ -30,15 +30,49 @@ public class LoginActivity extends AppCompatActivity
     {
         super.onStart();
 
+        mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        boolean fromSignup = getIntent().getBooleanExtra("fromSignup", false);
 
-        if(currentUser != null)
+        if (currentUser != null)
         {
-            Intent intent = new Intent(LoginActivity.this, FeedActivity.class);
-            startActivity(intent);
-            finish();
+            Log.d("LoginActivity", "User is logged in: " + currentUser.getEmail());
+
+            currentUser.reload().addOnCompleteListener(task -> {
+                FirebaseUser updatedUser = mAuth.getCurrentUser();
+
+                if (updatedUser == null)
+                {
+                    Log.d("LoginActivity", "User no longer exists in Firebase. Signing out...");
+                    mAuth.signOut();
+                    return;
+                }
+
+                Log.d("LoginActivity", "Email Verified: " + updatedUser.isEmailVerified());
+
+                if (updatedUser.isEmailVerified() && !fromSignup)
+                {
+                    Log.d("LoginActivity", "Redirecting to FeedActivity...");
+                    Intent intent = new Intent(LoginActivity.this, FeedActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+                else
+                {
+                    Log.d("LoginActivity", "User is logged in but email is NOT verified or came from Signup.");
+                }
+            });
+
+        }
+        else
+        {
+            Log.d("LoginActivity", "User is NOT logged in. Staying on LoginActivity.");
         }
     }
+
+
+
+
 
 
 
@@ -111,12 +145,20 @@ public class LoginActivity extends AppCompatActivity
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful())
                     {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-                        Log.d("Login", "User logged in: " + user.getEmail());
+                        if (mAuth.getCurrentUser().isEmailVerified()) {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                            Log.d("Login", "User logged in: " + user.getEmail());
 
-                        Intent intent = new Intent (LoginActivity.this, AccountCreateActivityPerson.class);
-                        startActivity(intent);
+                            Intent intent = new Intent(LoginActivity.this, FeedActivity.class);
+                            startActivity(intent);
+                        }
+
+                        else
+                        {
+                            Toast.makeText(LoginActivity.this, "Please verify your email address first", Toast.LENGTH_SHORT).show();
+                            FirebaseAuth.getInstance().signOut();
+                        }
                     }
 
                     else

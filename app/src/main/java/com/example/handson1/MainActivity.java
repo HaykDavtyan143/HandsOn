@@ -5,11 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -18,18 +18,39 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseApp.initializeApp(this);
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run()
-            {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
+        if (currentUser != null)
+        {
+            Log.d("MainActivity", "User is logged in: " + currentUser.getEmail());
+
+            currentUser.reload().addOnCompleteListener(task -> {
+                FirebaseUser updatedUser = mAuth.getCurrentUser();
+                if (updatedUser != null && updatedUser.isEmailVerified())
+                {
+                    Log.d("MainActivity", "Email verified. Redirecting to FeedActivity...");
+                    Intent intent = new Intent(com.example.handson1.MainActivity.this, FeedActivity.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Log.d("MainActivity", "Email not verified or user session expired. Redirecting to LoginActivity...");
+                    Intent intent = new Intent(com.example.handson1.MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
+
                 finish();
-            }
-        }, 1500);
+            });
 
+        }
+        else
+        {
+            Log.d("MainActivity", "User is NOT logged in. Redirecting to LoginActivity");
+            Intent intent = new Intent(com.example.handson1.MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+
+            finish();
+        }
     }
-
 }

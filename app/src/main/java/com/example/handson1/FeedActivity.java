@@ -1,6 +1,5 @@
 package com.example.handson1;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -17,8 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FeedActivity extends AppCompatActivity
-{
+public class FeedActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private FeedAdapter feedAdapter;
     protected List<Post> posts = new ArrayList<>();
@@ -26,8 +24,7 @@ public class FeedActivity extends AppCompatActivity
     private ImageButton btnHome, btnSearch, btnAddPost, btnMessages, btnProfile;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
 
@@ -35,42 +32,20 @@ public class FeedActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         feedAdapter = new FeedAdapter(this, posts);
         recyclerView.setAdapter(feedAdapter);
-        btnHome = findViewById(R.id.ib_home);
-        btnSearch = findViewById(R.id.ib_search);
-        btnAddPost = findViewById(R.id.ib_add_post);
-        btnMessages = findViewById(R.id.ib_messages);
-        btnProfile = findViewById(R.id.ib_profile);
+
+        if (getSupportFragmentManager().findFragmentByTag("NAVIGATION_BAR") != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .remove(getSupportFragmentManager().findFragmentByTag("NAVIGATION_BAR"))
+                    .commit();
+        }
 
         fetchPostsFromFirestore();
 
-        btnHome.setOnClickListener(v -> {
-            Intent intent = new Intent(FeedActivity.this, FeedActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        btnSearch.setOnClickListener(v -> {
-            Intent intent = new Intent(FeedActivity.this, SearchActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        btnAddPost.setOnClickListener(v -> {
-            Intent intent = new Intent(FeedActivity.this, AddPostActivity.class);
-            startActivity(intent);
-        });
-
-        btnMessages.setOnClickListener(v -> {
-            Intent intent = new Intent(FeedActivity.this, MessagesActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        btnProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(FeedActivity.this, ProfileActivity.class);
-            startActivity(intent);
-            finish();
-        });
+        //if (savedInstanceState == null) {
+         //  getSupportFragmentManager().beginTransaction()
+         //           .replace(R.id.fragment_container, new NavigationBarFragment())
+         //           .commit();
+        //}
     }
 
     public void fetchPostsFromFirestore() {
@@ -110,19 +85,12 @@ public class FeedActivity extends AppCompatActivity
                         }
                     }
 
-                    runOnUiThread(() -> {
-                        feedAdapter.notifyDataSetChanged();
-                    });
-
+                    runOnUiThread(() -> feedAdapter.notifyDataSetChanged());
                 })
                 .addOnFailureListener(e -> Log.e("FeedActivity", "Error fetching posts", e));
     }
 
-
-
-
-    private Map<String, Object> createPostMap(String title, String description)
-    {
+    private Map<String, Object> createPostMap(String title, String description) {
         Map<String, Object> postMap = new HashMap<>();
         postMap.put("title", title);
         postMap.put("description", description);
