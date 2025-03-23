@@ -21,8 +21,6 @@ public class FeedActivity extends AppCompatActivity {
     private FeedAdapter feedAdapter;
     protected List<Post> posts = new ArrayList<>();
 
-    private ImageButton btnHome, btnSearch, btnAddPost, btnMessages, btnProfile;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
