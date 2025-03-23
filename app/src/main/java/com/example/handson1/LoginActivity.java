@@ -98,9 +98,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent(LoginActivity.this, FeedActivity.class);
-                startActivity(intent);
-                finish();
+                logInTestUser();
             }
         });
 
@@ -129,6 +127,30 @@ public class LoginActivity extends AppCompatActivity
 
             etPassword.setSelection(etPassword.getText().length());
         });
+    }
+
+    private void logInTestUser ()
+    {
+        String testEmail = "testuser7887handson143@gmail.com";
+        String testPassword = "forhandsOn1";
+
+        mAuth.signInWithEmailAndPassword(testEmail, testPassword)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful())
+                    {
+                        Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+                        startActivity(intent);
+                        finish();
+
+                        Toast.makeText(LoginActivity.this, "Logged in as Test User", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    }
+                    else
+                    {
+                        Toast.makeText(LoginActivity.this, "Test login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
     private void loginUser()
     {
