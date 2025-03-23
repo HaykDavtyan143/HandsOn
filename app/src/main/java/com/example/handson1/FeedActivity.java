@@ -41,30 +41,39 @@ public class FeedActivity extends AppCompatActivity {
         }
     }
 
-    public void fetchPostsFromFirestore() {
+    public void fetchPostsFromFirestore()
+    {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("posts")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     posts.clear();
 
-                    for (QueryDocumentSnapshot document : querySnapshot) {
-                        try {
+                    for (QueryDocumentSnapshot document : querySnapshot)
+                    {
+                        try
+                        {
                             Post post = document.toObject(Post.class);
 
-                            if (document.getId() != null) {
+                            if (document.getId() != null)
+                            {
                                 post.setId(document.getId());
-                            } else {
+                            }
+                            else
+                            {
                                 Log.e("FeedActivity", "Post document ID is null: " + document.getData());
                                 continue;
                             }
 
                             Object commentsObject = document.get("comments");
 
-                            if (commentsObject instanceof Map) {
+                            if (commentsObject instanceof Map)
+                            {
                                 HashMap<String, Object> fixedComments = new HashMap<>((Map<String, Object>) commentsObject);
                                 post.setComments(fixedComments);
-                            } else {
+                            }
+                            else
+                            {
                                 post.setComments(new HashMap<>());
                                 Log.e("FeedActivity", "Unexpected comments format: " + commentsObject);
                             }
@@ -73,7 +82,9 @@ public class FeedActivity extends AppCompatActivity {
 
                             posts.add(post);
 
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e)
+                        {
                             Log.e("FeedActivity", "Error processing post: " + document.getId(), e);
                         }
                     }
@@ -81,14 +92,5 @@ public class FeedActivity extends AppCompatActivity {
                     runOnUiThread(() -> feedAdapter.notifyDataSetChanged());
                 })
                 .addOnFailureListener(e -> Log.e("FeedActivity", "Error fetching posts", e));
-    }
-
-    private Map<String, Object> createPostMap(String title, String description) {
-        Map<String, Object> postMap = new HashMap<>();
-        postMap.put("title", title);
-        postMap.put("description", description);
-        postMap.put("comments", new HashMap<String, Object>());
-        postMap.put("likes", 0);
-        return postMap;
     }
 }
