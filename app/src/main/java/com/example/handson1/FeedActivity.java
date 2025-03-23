@@ -33,19 +33,14 @@ public class FeedActivity extends AppCompatActivity {
         feedAdapter = new FeedAdapter(this, posts);
         recyclerView.setAdapter(feedAdapter);
 
-        if (getSupportFragmentManager().findFragmentByTag("NAVIGATION_BAR") != null) {
-            getSupportFragmentManager().beginTransaction()
-                    .remove(getSupportFragmentManager().findFragmentByTag("NAVIGATION_BAR"))
-                    .commit();
-        }
-
         fetchPostsFromFirestore();
 
-        //if (savedInstanceState == null) {
-         //  getSupportFragmentManager().beginTransaction()
-         //           .replace(R.id.fragment_container, new NavigationBarFragment())
-         //           .commit();
-        //}
+        if (savedInstanceState == null)
+        {
+           getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new NavigationBarFragment())
+                    .commit();
+        }
     }
 
     public void fetchPostsFromFirestore() {

@@ -6,10 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".FeedActivity">
 
-    <!-- Fragment container on top to overlay content -->
-
-
-    <!-- RecyclerView takes remaining space above navigation bar -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
@@ -29,7 +25,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Navigation Bar at the bottom -->
     <fragment
         android:id="@+id/navigationBarFragment"
         android:name="com.example.handson1.NavigationBarFragment"

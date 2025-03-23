@@ -32,6 +32,13 @@ public class AddPostActivity extends AppCompatActivity {
         feedActivity = new FeedActivity();
 
         buttonAddPost.setOnClickListener(v -> addPostToFirestore());
+
+        if (savedInstanceState == null)
+        {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new NavigationBarFragment())
+                    .commit();
+        }
     }
 
     private void addPostToFirestore()
