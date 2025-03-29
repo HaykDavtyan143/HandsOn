@@ -8,12 +8,17 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AddPostActivity extends AppCompatActivity {
+public class AddPostActivity extends AppCompatActivity
+{
 
     private EditText editTextTitle, editTextDescription;
     private Button buttonAddPost;
@@ -21,7 +26,8 @@ public class AddPostActivity extends AppCompatActivity {
     private FeedActivity feedActivity;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_post);
 
@@ -58,28 +64,67 @@ public class AddPostActivity extends AppCompatActivity {
             return;
         }
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        fetchCurrentUsername(username -> {
+            if (username != null)
+            {
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        Map<String, Object> likedBy = new HashMap<>();
-        Map<String, Object> comments = new HashMap<>();
-        Map<String, Object> post = new HashMap<>();
+                Map<String, Object> likedBy = new HashMap<>();
+                Map<String, Object> comments = new HashMap<>();
+                Map<String, Object> post = new HashMap<>();
 
-        post.put("title", title);
-        post.put("description", description);
-        post.put("comments", comments);
-        post.put("likes", 0);
-        post.put("likedBy", likedBy);
+                post.put("creator", username);
+                post.put("title", title);
+                post.put("description", description);
+                post.put("comments", comments);
+                post.put("likes", 0);
+                post.put("likedBy", likedBy);
 
-        db.collection("posts")
-                .add(post)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(this, "Post added successfully", Toast.LENGTH_SHORT).show();
-                    finish();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to add post: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                });
+                db.collection("posts")
+                        .add(post)
+                        .addOnSuccessListener(documentReference -> {
+                            Toast.makeText(this, "Post added successfully", Toast.LENGTH_SHORT).show();
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(this, "Failed to add post: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        });
+            }
+            else
+            {
+                Toast.makeText(this, "Username not found", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         feedActivity.fetchPostsFromFirestore();
+    }
+
+    private void fetchCurrentUsername(AccTypeCallback callback)
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null)
+        {
+            String uid = user.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference userRef = db.collection("users").document(uid);
+
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists())
+                {
+                    DocumentSnapshot document = task.getResult();
+                    String username = document.getString("Username");
+                    callback.onAccTypeRetrieved(username);
+                }
+                else
+                {
+                    callback.onAccTypeRetrieved(null);
+                }
+            });
+        }
+        else
+        {
+            callback.onAccTypeRetrieved(null);
+        }
     }
 }

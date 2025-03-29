@@ -1,16 +1,16 @@
 package com.example.handson1;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Post
 {
     private String id;
     private String title;
+    private String creator;
     private String description;
     private HashMap<String, Object> comments;
+    private HashMap<String, Object> likedBy;
+    private int commentsCount;
 
     private boolean isLiked = false;
 
@@ -23,6 +23,26 @@ public class Post
         this.title = title;
         this.description = description;
         this.comments = new HashMap<>();
+    }
+
+    public String getCreator()
+    {
+        return creator;
+    }
+
+    public void setCreator(String creator)
+    {
+        this.creator = creator;
+    }
+
+    public HashMap<String, Object> getLikedBy()
+    {
+        return likedBy;
+    }
+
+    public void setLikedBy(HashMap<String, Object> likedBy)
+    {
+        this.likedBy = likedBy;
     }
 
     public String getId()
@@ -84,6 +104,10 @@ public class Post
         comments.put("", comment);
     }
 
+    public void setCommentsCount (int commentCount)
+    {
+        this.commentsCount = commentCount;
+    }
     public int getCommentsCount()
     {
         return comments != null ? comments.size() : 0;

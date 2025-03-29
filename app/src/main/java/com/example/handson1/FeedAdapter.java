@@ -1,6 +1,5 @@
 package com.example.handson1;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder> {
+public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder>
+{
     private Context context;
     private List<Post> posts;
 
@@ -52,9 +52,20 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         String userId = currentUser.getUid();
 
         Post post = posts.get(position);
+        holder.creator.setText(post.getCreator());
         holder.title.setText(post.getTitle());
         holder.description.setText(post.getDescription());
-        holder.commentCount.setText(String.valueOf(post.getCommentsCount()));
+
+        getCommentCount(post.getId(), new CommentCountCallback()
+        {
+            @Override
+            public void onCommentCountFetched(int count)
+            {
+                post.setCommentsCount(count);
+                holder.commentCount.setText(String.valueOf(count));
+            }
+        });
+
         holder.likeCount.setText(String.valueOf(post.getLikes()));
 
         if (post.getId() == null || post.getId().isEmpty()) {
@@ -64,7 +75,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         holder.commentButton.setOnClickListener(v -> {
             Log.d("FeedAdapter", "Context: " + context.getClass().getSimpleName());
-            if (context instanceof AppCompatActivity) {
+
+            if (context instanceof AppCompatActivity)
+            {
                 AppCompatActivity activity = (AppCompatActivity) context;
 
                 try
@@ -167,11 +180,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             Post post = posts.get(i);
             if (post.getId().equals(postId))
             {
-
                 RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(i);
-                if (viewHolder != null)
-                {
-                    FeedAdapter.FeedViewHolder holder = (FeedAdapter.FeedViewHolder) viewHolder;
+                if (viewHolder != null) {
+                    FeedViewHolder holder = (FeedViewHolder) viewHolder;
                     holder.commentCount.setText(String.valueOf(newCommentCount));
                 }
                 break;
@@ -179,13 +190,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         }
     }
 
-
-    public int getCommentCount(String postId)
+    public void getCommentCount(String postId, CommentCountCallback callback)
     {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference postRef = db.collection("posts").document(postId);
-
-        final int[] commentCount = {0};
 
         postRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful())
@@ -194,10 +202,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 if (document.exists())
                 {
                     Map<String, Object> commentsMap = (Map<String, Object>) document.get("comments");
-                    if (commentsMap != null)
-                    {
-                        commentCount[0] = commentsMap.size();
-                    }
+                    int commentCount = commentsMap != null ? commentsMap.size() : 0;
+                    callback.onCommentCountFetched(commentCount);
+                }
+                else
+                {
+                    Log.e("FeedAdapter", "Post not found!");
                 }
             }
             else
@@ -205,18 +215,18 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 Log.e("FeedAdapter", "Error getting post document: ", task.getException());
             }
         });
-
-        return commentCount[0];
     }
+
 
     static class FeedViewHolder extends RecyclerView.ViewHolder
     {
-        TextView title, description, commentCount, likeCount;
+        TextView creator, title, description, commentCount, likeCount;
         ImageButton commentButton, likeButton;
 
         public FeedViewHolder(@NonNull View itemView)
         {
             super(itemView);
+            creator = itemView.findViewById(R.id.post_creator);
             title = itemView.findViewById(R.id.post_title);
             description = itemView.findViewById(R.id.post_description);
             commentCount = itemView.findViewById(R.id.comment_count);
@@ -225,4 +235,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             likeButton = itemView.findViewById(R.id.like_button);
         }
     }
+}
+interface CommentCountCallback
+{
+    void onCommentCountFetched(int count);
 }

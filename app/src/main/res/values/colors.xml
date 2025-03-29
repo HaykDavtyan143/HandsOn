@@ -10,6 +10,8 @@
     <color name="nav_icon">#A0A0A0</color>
     <color name="nav_icon_active">#FF3D71</color>
     <color name="nav_bar_background">#FFFFFF</color>
+    <color name="red">#E0474B</color>
+    <color name="handson">#22EAAB</color>
 
     <color name="button_primary">#FF3D71</color>
     <color name="button_secondary">#5A5A5A</color>
@@ -19,4 +21,5 @@
 
     <color name="shadow_light">#E0E0E0</color>
     <color name="shadow_dark">#000000</color>
+    <color name="darkGray">#606060</color>
 </resources>

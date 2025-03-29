@@ -1,9 +1,9 @@
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".SignupActivity"
     android:padding="16dp">
 
     <Button
@@ -11,7 +11,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Back"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <EditText
         android:id="@+id/edittextEmail"
@@ -20,7 +24,10 @@
         android:hint="Email"
         android:inputType="textEmailAddress"
         android:padding="12dp"
-        android:layout_marginTop="175dp"/>
+        android:layout_marginTop="175dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonBack"/>
 
     <EditText
         android:id="@+id/edittextUsername"
@@ -28,12 +35,19 @@
         android:layout_height="wrap_content"
         android:hint="Username"
         android:inputType="textEmailAddress"
-        android:padding="12dp"/>
+        android:padding="12dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edittextEmail"/>
 
     <RelativeLayout
+        android:id="@+id/passLay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edittextUsername">
 
         <EditText
             android:id="@+id/edittextPassword"
@@ -55,9 +69,13 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/confirmPassLay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passLay">
 
         <EditText
             android:id="@+id/edittextConfirmPassword"
@@ -82,7 +100,10 @@
         android:id="@+id/check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:backgroundTint="@color/handson"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/confirmPassLay">
 
         <RadioButton
             android:id="@+id/volunteer"
@@ -90,14 +111,16 @@
             android:layout_height="wrap_content"
             android:text="Volunteer"
             android:textStyle="bold"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            app:buttonTint="@color/radio_button_color"/>
 
         <RadioButton
             android:id="@+id/organization"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Organization"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            app:buttonTint="@color/radio_button_color"/>
     </RadioGroup>
 
     <Button
@@ -106,5 +129,23 @@
         android:layout_height="wrap_content"
         android:text="Sign Up"
         android:layout_marginTop="8dp"
-        android:textStyle="bold"/>
-</LinearLayout>
+        android:textStyle="bold"
+        app:backgroundTint="@color/handson"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/check"/>
+
+    <Button
+        android:id="@+id/btnLogIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Already have an account? Log In"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:background="@android:color/transparent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSignUp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

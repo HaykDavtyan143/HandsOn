@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,7 +25,7 @@ public class CommentsFragment extends Fragment {
     private EditText commentInput;
     private FeedAdapter feedAdapter;
     private FeedActivity feedActivity;
-    private Button postCommentButton;
+    private ImageButton postCommentButton;
     private CommentsAdapter commentsAdapter;
     private HashMap<String, Object> comments = new HashMap<>();
     private String postId;
@@ -104,7 +106,13 @@ public class CommentsFragment extends Fragment {
                         })
                         .addOnFailureListener(e -> Log.e("CommentsFragment", "Error adding comment", e));
 
-                feedAdapter.updateCommentCountForPost(postId, feedAdapter.getCommentCount(postId));
+                feedAdapter.getCommentCount(postId, new CommentCountCallback()
+                {
+                    @Override
+                    public void onCommentCountFetched(int count) {
+                        feedAdapter.updateCommentCountForPost(postId, count);
+                    }
+                });
             }
         });
 

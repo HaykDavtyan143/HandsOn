@@ -1,6 +1,5 @@
 package com.example.handson1;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,6 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity
 {
@@ -24,6 +26,8 @@ public class LoginActivity extends AppCompatActivity
     private Button btnLogin, btnSignUp, btnTestUser;
     private ImageButton passwordToggle;
     private FirebaseAuth mAuth;
+
+    private User currUser;
 
     @Override
     public void onStart()
@@ -52,6 +56,11 @@ public class LoginActivity extends AppCompatActivity
 
                 if (updatedUser.isEmailVerified() && !fromSignup)
                 {
+                    fetchCurrentUsername(username -> {
+                        fetchCurrentAccType(accType -> {
+                            currUser = new User(updatedUser.getUid(), username, accType);
+                        });
+                    });
                     Log.d("LoginActivity", "Redirecting to FeedActivity...");
                     Intent intent = new Intent(LoginActivity.this, FeedActivity.class);
                     startActivity(intent);
@@ -71,10 +80,10 @@ public class LoginActivity extends AppCompatActivity
     }
 
 
-
-
-
-
+    public User getCurrUser ()
+    {
+        return currUser;
+    }
 
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -142,13 +151,14 @@ public class LoginActivity extends AppCompatActivity
                         startActivity(intent);
                         finish();
 
-                        Toast.makeText(LoginActivity.this, "Logged in as Test User", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                        Log.d("Login", "Guest logged in");
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
                     }
                     else
                     {
-                        Toast.makeText(LoginActivity.this, "Test login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Guest login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -167,7 +177,8 @@ public class LoginActivity extends AppCompatActivity
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful())
                     {
-                        if (mAuth.getCurrentUser().isEmailVerified()) {
+                        if (mAuth.getCurrentUser().isEmailVerified())
+                        {
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
                             Log.d("Login", "User logged in: " + user.getEmail());
@@ -190,4 +201,72 @@ public class LoginActivity extends AppCompatActivity
                     }
                 });
     }
+
+    private void fetchCurrentUsername(AccTypeCallback callback)
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null)
+        {
+            String uid = user.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference userRef = db.collection("users").document(uid);
+
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists())
+                {
+                    DocumentSnapshot document = task.getResult();
+                    String username = document.getString("Username");
+                    callback.onAccTypeRetrieved(username);
+                }
+                else
+                {
+                    callback.onAccTypeRetrieved(null);
+                }
+            });
+        }
+        else
+        {
+            callback.onAccTypeRetrieved(null);
+        }
+    }
+
+    private void fetchCurrentAccType(UsernameCallback callback)
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null)
+        {
+            String uid = user.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference userRef = db.collection("users").document(uid);
+
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists())
+                {
+                    DocumentSnapshot document = task.getResult();
+                    String username = document.getString("Type");
+                    callback.onUsernameRetrieved(username);
+                }
+                else
+                {
+                    callback.onUsernameRetrieved(null);
+                }
+            });
+        }
+        else
+        {
+            callback.onUsernameRetrieved(null);
+        }
+    }
 }
+interface AccTypeCallback
+{
+    void onAccTypeRetrieved(String username);
+}
+interface UsernameCallback
+{
+    void onUsernameRetrieved(String username);
+}
+
+

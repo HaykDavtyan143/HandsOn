@@ -2,12 +2,10 @@ package com.example.handson1;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -16,7 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FeedActivity extends AppCompatActivity {
+public class FeedActivity extends AppCompatActivity
+{
     private RecyclerView recyclerView;
     private FeedAdapter feedAdapter;
     protected List<Post> posts = new ArrayList<>();
@@ -40,7 +39,6 @@ public class FeedActivity extends AppCompatActivity {
                     .commit();
         }
     }
-
     public void fetchPostsFromFirestore()
     {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -54,6 +52,7 @@ public class FeedActivity extends AppCompatActivity {
                         try
                         {
                             Post post = document.toObject(Post.class);
+                            post.setCreator(document.getString("creator"));
 
                             if (document.getId() != null)
                             {
@@ -89,7 +88,10 @@ public class FeedActivity extends AppCompatActivity {
                         }
                     }
 
-                    runOnUiThread(() -> feedAdapter.notifyDataSetChanged());
+                    if (feedAdapter != null)
+                    {
+                        runOnUiThread(() -> feedAdapter.notifyDataSetChanged());
+                    }
                 })
                 .addOnFailureListener(e -> Log.e("FeedActivity", "Error fetching posts", e));
     }

@@ -1,6 +1,5 @@
 package com.example.handson1;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -32,7 +30,7 @@ public class SignupActivity extends AppCompatActivity
     private int type;
     private EditText etEmail;
     private EditText etPassword, etConfirmPassword, etUsername;
-    private Button btnSignUp, btnBack;
+    private Button btnSignUp, btnBack, btnLogIn;
     private RadioGroup check;
     private ImageButton passwordToggle1, passwordToggle2;
     private FirebaseAuth mAuth;
@@ -42,7 +40,6 @@ public class SignupActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        // Catch unexpected exceptions
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
             Log.e("AppCrash", "Unhandled exception: ", throwable);
             runOnUiThread(() ->
@@ -60,12 +57,18 @@ public class SignupActivity extends AppCompatActivity
         etUsername = findViewById(R.id.edittextUsername);
         btnSignUp = findViewById(R.id.btnSignUp);
         btnBack = findViewById(R.id.buttonBack);
+        btnLogIn = findViewById(R.id.btnLogIn);
         check = findViewById(R.id.check);
         passwordToggle1 = findViewById(R.id.passwordToggle1);
         passwordToggle2=findViewById(R.id.passwordToggle2);
         btnSignUp.setOnClickListener(v -> signUpUser());
 
 
+        btnLogIn.setOnClickListener(v -> {
+            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        });
 
         passwordToggle1.setOnClickListener(v -> {
             if (etPassword.getTransformationMethod() instanceof PasswordTransformationMethod)
@@ -150,19 +153,19 @@ public class SignupActivity extends AppCompatActivity
 
         if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && TextUtils.isEmpty(confirmPassword))
         {
-            Toast.makeText(this, "Please confirm the password", Toast.LENGTH_SHORT).show();
+            etConfirmPassword.setError("Please confirm the password");
             return;
         }
 
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches())
         {
-            Toast.makeText(this, "Invalid email format!", Toast.LENGTH_SHORT).show();
+            etEmail.setError("Invalid email format!");
             return;
         }
 
         if (password.length() < 6)
         {
-            Toast.makeText(this, "Password must be at least 6 characters long!", Toast.LENGTH_SHORT).show();
+            etPassword.setError("Password must be at least 6 characters long!");
             return;
         }
 
@@ -208,7 +211,7 @@ public class SignupActivity extends AppCompatActivity
 
                                                 User.put("Username", username);
 
-                                                db.collection("users").add(User)
+                                                db.collection("users").document(userId).set(User)
                                                         .addOnSuccessListener(aVoid -> {
                                                             Log.d("Firestore", "User saved successfully.");
                                                         })

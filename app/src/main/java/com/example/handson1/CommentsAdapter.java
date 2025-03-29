@@ -4,16 +4,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder> {
+public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
+{
 
     private HashMap<String, Object> comments;
 
@@ -24,13 +20,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     @NonNull
     @Override
-    public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_item, parent, false);
         return new CommentViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CommentViewHolder holder, int position)
+    {
         String commentKey = (String) comments.keySet().toArray()[position];
         String commentText = (String) comments.get(commentKey);
 
@@ -38,14 +36,17 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return comments.size();
     }
 
-    static class CommentViewHolder extends RecyclerView.ViewHolder {
+    static class CommentViewHolder extends RecyclerView.ViewHolder
+    {
         TextView commentText;
 
-        public CommentViewHolder(@NonNull View itemView) {
+        public CommentViewHolder(@NonNull View itemView)
+        {
             super(itemView);
             commentText = itemView.findViewById(R.id.comment_text);
         }
