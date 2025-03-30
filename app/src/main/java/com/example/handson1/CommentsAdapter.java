@@ -1,5 +1,6 @@
 package com.example.handson1;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         String commentText = (String) comments.get(commentKey);
 
         holder.commentText.setText(commentText);
+        holder.commentText.setTextColor(Color.BLACK);
     }
 
     @Override
@@ -44,11 +46,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     static class CommentViewHolder extends RecyclerView.ViewHolder
     {
         TextView commentText;
-
         public CommentViewHolder(@NonNull View itemView)
         {
             super(itemView);
             commentText = itemView.findViewById(R.id.comment_text);
+            commentText.setTextColor(Color.BLACK);
         }
     }
 }

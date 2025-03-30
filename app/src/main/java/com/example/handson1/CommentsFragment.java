@@ -1,5 +1,6 @@
 package com.example.handson1;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -49,6 +50,7 @@ public class CommentsFragment extends Fragment {
 
         commentsRecyclerView = view.findViewById(R.id.comments_recycler_view);
         commentInput = view.findViewById(R.id.comment_input);
+        commentInput.setTextColor(Color.BLACK);
         postCommentButton = view.findViewById(R.id.post_comment_button);
 
         commentsAdapter = new CommentsAdapter(comments);
