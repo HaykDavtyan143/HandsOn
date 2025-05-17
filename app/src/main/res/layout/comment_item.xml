@@ -1,6 +1,54 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/comment_text"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
-    android:textSize="16sp" />
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <Button
+        android:id="@+id/creator_name_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Creator Name"
+        android:textColor="@color/black"
+        android:background="@android:color/transparent"
+        android:padding="0dp"
+        android:insetLeft="0dp"
+        android:gravity="start"
+        android:insetRight="0dp"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/comment_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/darkGray"
+        android:text="Comment body"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/like_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/rounded_button_white"
+            android:padding="3dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_notliked"/>
+
+        <TextView
+            android:id="@+id/like_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="0"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+</LinearLayout>
+
+

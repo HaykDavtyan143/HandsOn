@@ -11,10 +11,12 @@
     <color name="nav_icon_active">#FF3D71</color>
     <color name="nav_bar_background">#FFFFFF</color>
     <color name="red">#E0474B</color>
-    <color name="handson">#22EAAB</color>
+    <color name="handson">#E966CE8C</color>
 
     <color name="button_primary">#FF3D71</color>
     <color name="button_secondary">#5A5A5A</color>
+    <color name="handson_secondary">#A9CBB7</color>
+    <color name="softGray">#B0B0B0</color>
 
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>

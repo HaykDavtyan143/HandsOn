@@ -7,22 +7,113 @@
     android:layout_height="match_parent"
     tools:context=".SearchActivity">
 
+   <EditText
+       android:id="@+id/etSearch"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:hint="Search"
+       android:textColorHint="@color/text_secondary"
+       android:background="@drawable/bg_edittext"
+       android:elevation="4dp"
+       android:layout_marginRight="55dp"
+       android:layout_marginLeft="15dp"
+       android:layout_marginTop="20dp"
+       app:layout_constraintTop_toTopOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"/>
+
+    <ImageButton
+        android:id="@+id/ib_search"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_weight="1"
+        android:padding="1dp"
+        android:contentDescription="Search"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/ic_search"
+        android:tint="@color/handson"
+        android:layout_marginTop="30dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/etSearch"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <Button
+        android:id="@+id/btnPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Posts"
+        android:textSize="15sp"
+        android:layout_marginLeft="80dp"
+        android:textColor="@color/darkGray"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toBottomOf="@+id/etSearch"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/btnUser"
+        android:visibility="gone"/>
+
+     <View
+         android:id="@+id/lineV"
+         android:layout_width="1dp"
+         android:layout_height="30dp"
+         android:background="@color/darkGray"
+         app:layout_constraintTop_toBottomOf="@+id/etSearch"
+         app:layout_constraintLeft_toRightOf="@id/btnPost"
+         app:layout_constraintRight_toLeftOf="@id/btnUser"
+         app:layout_constraintBottom_toTopOf="@+id/searchRecyclerView"
+         android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btnUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Users"
+        android:textSize="15sp"
+        android:layout_marginRight="80dp"
+        android:textColor="@color/darkGray"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toBottomOf="@+id/etSearch"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/btnPost"
+        android:visibility="gone"/>
+
+    <View
+        android:id="@+id/lineH"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/darkGray"
+        app:layout_constraintTop_toBottomOf="@+id/btnUser"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="51dp"
+        app:layout_constraintTop_toBottomOf="@+id/etSearch"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
     <FrameLayout
         android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+
     <fragment
         android:id="@+id/navigationBarFragment"
-        android:name="com.example.handson1.NavigationBarFragment"
+        android:name="com.haykdavtyan.handson.NavigationBarFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
