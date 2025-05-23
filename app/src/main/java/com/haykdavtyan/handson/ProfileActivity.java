@@ -123,7 +123,7 @@ public class ProfileActivity extends AppCompatActivity
         });
 
         edit.setOnClickListener(v -> {
-
+            Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
         });
 
     }
