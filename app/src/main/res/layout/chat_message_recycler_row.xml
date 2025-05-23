@@ -8,6 +8,7 @@
         android:id="@+id/leftChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:background="@drawable/bg_edittext"
         android:backgroundTint="@color/darkGray"
         android:padding="8dp"
@@ -18,13 +19,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/background_light"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/leftChatTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:45 PM"
+            android:textSize="8sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="4dp"
+            android:layout_gravity="end"/>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/rightChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:background="@drawable/bg_edittext"
         android:backgroundTint="@color/handson"
         android:layout_alignParentEnd="true"
@@ -36,7 +48,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/background_light"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/rightChatTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:45 PM"
+            android:textSize="8sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="4dp"
+            android:layout_gravity="end"/>
     </LinearLayout>
 
 </RelativeLayout>

@@ -1,54 +1,63 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
-
-    <Button
-        android:id="@+id/creator_name_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Creator Name"
-        android:textColor="@color/black"
-        android:background="@android:color/transparent"
-        android:padding="0dp"
-        android:insetLeft="0dp"
-        android:gravity="start"
-        android:insetRight="0dp"
-        android:textSize="17sp" />
-
-    <TextView
-        android:id="@+id/comment_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="@color/darkGray"
-        android:text="Comment body"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginVertical="4dp"
+    android:layout_marginHorizontal="8dp"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1dp"
+    android:backgroundTint="#FAFAFA">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="4dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="12dp">
 
-        <ImageButton
-            android:id="@+id/like_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/rounded_button_white"
-            android:padding="3dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_notliked"/>
-
-        <TextView
-            android:id="@+id/like_count"
+        <Button
+            android:id="@+id/creator_name_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="0"
-            android:textColor="@android:color/black" />
+            android:text="Creator Name"
+            android:textColor="@color/black"
+            android:background="@android:color/transparent"
+            android:padding="0dp"
+            android:textSize="17sp"
+            android:gravity="start" />
+
+        <TextView
+            android:id="@+id/comment_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/darkGray"
+            android:text="Comment body"
+            android:layout_marginTop="2dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/like_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/rounded_button_white"
+                android:padding="3dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_notliked" />
+
+            <TextView
+                android:id="@+id/like_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="0"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
-
-
+</androidx.cardview.widget.CardView>

@@ -14,9 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class ChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageModel, ChatRecyclerAdapter.ChatModelViewHolder>
@@ -38,9 +43,20 @@ public class ChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageMod
     {
         if (model.getSenderId().equals(currentUser.getUid()))
         {
+            Timestamp timestamp = model.getTimestamp();
+            String formattedTime = "";
+
+            if (timestamp != null)
+            {
+                Date date = timestamp.toDate();
+                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                formattedTime = sdf.format(date);
+            }
             holder.leftChatLayout.setVisibility(View.GONE);
             holder.rightChatLayout.setVisibility(View.VISIBLE);
             holder.rightChatTextview.setText(model.getMessage());
+            holder.rightChatTime.setText(formattedTime);
+
         }
         else
         {
@@ -61,7 +77,7 @@ public class ChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageMod
     class ChatModelViewHolder extends RecyclerView.ViewHolder
     {
         LinearLayout leftChatLayout, rightChatLayout;
-        TextView leftChatTextview, rightChatTextview;
+        TextView leftChatTextview, rightChatTextview, leftChatTime, rightChatTime;
 
         public ChatModelViewHolder(@NonNull View itemView)
         {
@@ -71,6 +87,8 @@ public class ChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageMod
             rightChatLayout = itemView.findViewById(R.id.rightChat);
             leftChatTextview = itemView.findViewById(R.id.leftChatTV);
             rightChatTextview = itemView.findViewById(R.id.rightChatTV);
+            leftChatTime = itemView.findViewById(R.id.leftChatTime);
+            rightChatTime = itemView.findViewById(R.id.rightChatTime);
         }
     }
 }

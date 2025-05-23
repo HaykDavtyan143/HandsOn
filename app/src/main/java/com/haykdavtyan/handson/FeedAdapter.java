@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -25,8 +27,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder>
@@ -75,9 +79,59 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             }
         });
 
+        if (Timestamp.now().compareTo(post.getExpirationTime()) > 0)
+        {
+            holder.creator.setVisibility(View.GONE);
+            holder.creatorType.setVisibility(View.GONE);
+            holder.created.setVisibility(View.GONE);
+            holder.expires.setVisibility(View.GONE);
+            holder.title.setVisibility(View.GONE);
+            holder.description.setVisibility(View.GONE);
+            holder.likeButton.setVisibility(View.GONE);
+            holder.likeCount.setVisibility(View.GONE);
+            holder.commentButton.setVisibility(View.GONE);
+            holder.commentCount.setVisibility(View.GONE);
+            holder.approve.setVisibility(View.GONE);
+
+            holder.expired.setVisibility(View.VISIBLE);
+
+            holder.expired.setOnClickListener(v -> {
+                holder.creator.setVisibility(View.VISIBLE);
+                holder.creatorType.setVisibility(View.VISIBLE);
+                holder.created.setVisibility(View.VISIBLE);
+                holder.expires.setVisibility(View.VISIBLE);
+                holder.title.setVisibility(View.VISIBLE);
+                holder.description.setVisibility(View.VISIBLE);
+                holder.likeButton.setVisibility(View.VISIBLE);
+                holder.likeCount.setVisibility(View.VISIBLE);
+                holder.commentButton.setVisibility(View.VISIBLE);
+                holder.commentCount.setVisibility(View.VISIBLE);
+
+                holder.expired.setVisibility(View.GONE);
+            });
+        }
+
         holder.likeCount.setText(String.valueOf(post.getLikes()));
 
-        if (post.getId() == null || post.getId().isEmpty()) {
+        holder.creatorType.setText(String.valueOf(post.getCreatorType()));
+
+        holder.created.setText("Created: " + new SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                .format(post.getCreationTime().toDate()));
+
+        holder.expires.setText("Expires: " + new SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                .format(post.getExpirationTime().toDate()));
+
+        if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals("fwRn6dA7tQMMCOmebDVzY8yUeKp2"))
+        {
+            holder.approve.setVisibility(View.GONE);
+        }
+        else
+        {
+            holder.approve.setVisibility(View.VISIBLE);
+        }
+
+        if (post.getId() == null || post.getId().isEmpty())
+        {
             Log.e("FeedAdapter", "Invalid Post ID: " + post.getTitle());
             return;
         }
@@ -89,6 +143,37 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             intent.putExtra("creatorType", post.getCreatorType());
             context.startActivity(intent);
         });
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference postRef = db.collection("posts").document(post.getId());
+
+        holder.approve.setOnClickListener(v -> {
+            postRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        holder.likeButton.setEnabled(false);
+
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("approved", true);
+
+                        postRef.update(updates)
+                                .addOnSuccessListener(aVoid -> {
+                                    int positionToRemove = holder.getAdapterPosition();
+                                    if (positionToRemove != RecyclerView.NO_POSITION) {
+                                        posts.remove(positionToRemove);
+                                        notifyItemRemoved(positionToRemove);
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("FeedAdapter", "Failed to update approval: ", e);
+                                });
+                    }
+                }
+            });
+        });
+
+
 
         holder.commentButton.setOnClickListener(v -> {
             Log.d("FeedAdapter", "Context: " + context.getClass().getSimpleName());
@@ -121,9 +206,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 Log.e("FeedAdapter", "Context is not an AppCompatActivity!");
             }
         });
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference postRef = db.collection("posts").document(post.getId());
 
         postRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful())
@@ -249,9 +331,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     static class FeedViewHolder extends RecyclerView.ViewHolder
     {
-        TextView creator, title, description, commentCount, likeCount;
+        TextView creator, creatorType, created, expires, title, description, commentCount, likeCount, expired;
         ImageButton commentButton, likeButton;
-
+        Button approve;
         public FeedViewHolder(@NonNull View itemView)
         {
             super(itemView);
@@ -259,9 +341,14 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             title = itemView.findViewById(R.id.post_title);
             description = itemView.findViewById(R.id.post_description);
             commentCount = itemView.findViewById(R.id.comment_count);
+            creatorType = itemView.findViewById(R.id.creatorType);
+            created = itemView.findViewById(R.id.created);
+            expires = itemView.findViewById(R.id.expires);
+            expired = itemView.findViewById(R.id.expired);
             likeCount = itemView.findViewById(R.id.like_count);
             commentButton = itemView.findViewById(R.id.comment_button);
             likeButton = itemView.findViewById(R.id.like_button);
+            approve = itemView.findViewById(R.id.approve);
         }
     }
 

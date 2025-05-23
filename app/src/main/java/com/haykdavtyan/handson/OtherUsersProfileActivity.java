@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -38,7 +39,6 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
     private String creator, creatorID, creatorType;
     private TextView Username, Type, bio;
     private Button btnFollowers, btnFollowing, btnPostsCount, btnFollow, btnMessage;
-    private ImageButton btnPosts;
     private RecyclerView recyclerView;
     private FeedAdapter feedAdapter;
     protected List<Post> posts = new ArrayList<>();
@@ -64,7 +64,6 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
         btnFollowing = findViewById(R.id.followingCount);
         btnFollow = findViewById(R.id.follow);
         btnMessage = findViewById(R.id.message);
-        btnPosts = findViewById(R.id.btnPosts);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         feedAdapter = new FeedAdapter(this, posts);
@@ -105,7 +104,7 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
             public void run()
             {
                 int bioHeight = bio.getHeight();
-                int marginTop = (int) (300 * getResources().getDisplayMetrics().density);
+                int marginTop = (int) (270 * getResources().getDisplayMetrics().density);
                 marginTop += bioHeight;
 
                 ViewGroup.MarginLayoutParams recyclerViewParams = (ViewGroup.MarginLayoutParams) recyclerView.getLayoutParams();
@@ -152,6 +151,7 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             db.collection("posts")
+                    .orderBy("creationTime", Query.Direction.DESCENDING)
                     .get()
                     .addOnSuccessListener(querySnapshot -> {
                         posts.clear();
@@ -162,6 +162,11 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
                             {
                                 Post post = document.toObject(Post.class);
                                 post.setCreator(document.getString("creator"));
+                                post.setCreatorId(document.getString("creatorID"));
+                                post.setCreatorType(document.getString("creatorType"));
+                                post.setApproved((document.getBoolean("approved")));
+                                post.setCreationTime(document.getTimestamp("creationTime"));
+                                post.setExpirationTime(document.getTimestamp("expirationTime"));
 
                                 if (document.getId() != null)
                                 {
@@ -188,7 +193,7 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
 
                                 Log.d("ProfileActivity", "Fetched post ID: " + post.getId() + ", Comments: " + post.getComments());
 
-                                if (username.equals(document.getString("creator")))
+                                if ((username.equals(document.getString("creator"))) && document.getBoolean("approved"))
                                 {
                                     posts.add(post);
                                 }
@@ -255,7 +260,6 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
         DocumentReference currentUserRef = db.collection("users").document(currentUserId);
         DocumentReference otherUserRef = db.collection("users").document(creatorID);
 
-        // Fetch both users
         currentUserRef.get().addOnSuccessListener(currentSnapshot -> {
             if (!currentSnapshot.exists()) return;
 

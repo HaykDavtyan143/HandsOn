@@ -1,0 +1,7 @@
+<resources>
+    <style name="DatePickerDialogTheme" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="colorAccent">@color/handson</item>
+        <item name="colorPrimary">@color/handson</item>
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+</resources>

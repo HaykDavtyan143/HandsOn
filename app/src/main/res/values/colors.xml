@@ -17,6 +17,7 @@
     <color name="button_secondary">#5A5A5A</color>
     <color name="handson_secondary">#A9CBB7</color>
     <color name="softGray">#B0B0B0</color>
+    <color name="timestamp">#ABABAB</color>
 
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>

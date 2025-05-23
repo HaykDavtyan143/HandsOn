@@ -1,5 +1,7 @@
 package com.haykdavtyan.handson;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,13 +29,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     private String postId;
     private String currentUserId;
     private FirebaseFirestore db;
+    private Context context;
 
     public CommentsAdapter(
+            Context context,
             Map<String, Map<String, Object>> commentsMap,
             List<String> commentKeys,
             String postId,
             String currentUserId
     ) {
+        this.context = context;
         this.commentsMap = commentsMap;
         this.commentKeys = commentKeys;
         this.postId = postId;
@@ -66,6 +71,17 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             } else {
                 holder.creatorNameButton.setVisibility(View.GONE);
             }
+
+            String creatorId = data.get("creatorId") != null ? (String) data.get("creatorId") : null;
+            String creatorType = data.get("creatorType") != null ? (String) data.get("creatorType") : null;
+
+            holder.creatorNameButton.setOnClickListener(v ->{
+                Intent intent = new Intent(context, OtherUsersProfileActivity.class);
+                intent.putExtra("creatorID", creatorId);
+                intent.putExtra("creator", creator);
+                intent.putExtra("creatorType", creatorType);
+                context.startActivity(intent);
+            });
         }
 
         // 2) Load likes & likedBy
@@ -106,14 +122,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                         })
                         .addOnFailureListener(e -> Log.e("CommentsAdapter", "toggle like failed", e));
             });
-        });
-
-        // Creator button click
-        holder.creatorNameButton.setOnClickListener(v -> {
-            String creator = data != null ? (String) data.get("creator") : null;
-            if (creator != null) {
-                Toast.makeText(v.getContext(), "Profile: " + creator, Toast.LENGTH_SHORT).show();
-            }
         });
     }
 

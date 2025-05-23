@@ -1,21 +1,27 @@
 package com.haykdavtyan.handson;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class AddPostActivity extends AppCompatActivity
@@ -25,6 +31,8 @@ public class AddPostActivity extends AppCompatActivity
     private Button buttonAddPost;
 
     private FeedActivity feedActivity;
+
+    private Timestamp expirationTimestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,6 +59,49 @@ public class AddPostActivity extends AppCompatActivity
                     .replace(R.id.fragment_container, new NavigationBarFragment())
                     .commit();
         }
+
+        TextView expirationDateView = findViewById(R.id.text_view_expiration_date);
+
+        expirationDateView.setOnClickListener(v -> {
+            final Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    this, R.style.DatePickerDialogTheme,
+                    (view, year1, month1, dayOfMonth) -> {
+                        calendar.set(Calendar.YEAR, year1);
+                        calendar.set(Calendar.MONTH, month1);
+                        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+                        calendar.set(Calendar.MILLISECOND, 0);
+
+                        Calendar today = Calendar.getInstance();
+                        today.set(Calendar.HOUR_OF_DAY, 0);
+                        today.set(Calendar.MINUTE, 0);
+                        today.set(Calendar.SECOND, 0);
+                        today.set(Calendar.MILLISECOND, 0);
+
+                        if (calendar.after(today)) {
+                            expirationTimestamp = new Timestamp(calendar.getTime());
+
+                            String formattedDate = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                                    .format(calendar.getTime());
+                            expirationDateView.setText(formattedDate);
+                        } else {
+                            Toast.makeText(this, "Expiration date must be in the future", Toast.LENGTH_SHORT).show();
+                        }
+                    },
+                    year, month, day
+            );
+
+
+            datePickerDialog.show();
+        });
+
     }
 
     private void addPostToFirestore()
@@ -100,6 +151,9 @@ public class AddPostActivity extends AppCompatActivity
                 post.put("likedBy", likedBy);
                 post.put("creatorID", creatorId);
                 post.put("creatorType", type);
+                post.put("creationTime", Timestamp.now());
+                post.put("expirationTime", expirationTimestamp);
+                post.put("approved", false);
 
                 db.collection("posts")
                         .add(post)

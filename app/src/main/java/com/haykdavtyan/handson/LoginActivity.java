@@ -140,8 +140,8 @@ public class LoginActivity extends AppCompatActivity
 
     private void logInTestUser ()
     {
-        String testEmail = "testuser7887handson143@gmail.com";
-        String testPassword = "forhandsOn1";
+        String testEmail = "individualproject2025@gmail.com";
+        String testPassword = "Samsung2025";
 
         mAuth.signInWithEmailAndPassword(testEmail, testPassword)
                 .addOnCompleteListener(this, task -> {
@@ -149,7 +149,7 @@ public class LoginActivity extends AppCompatActivity
                     {
                         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                        currUser = new User ("testuser7887handson143@gmail.com", currentUser.getUid(), "Test", "Volunteer", "forhandsOn1");
+                        currUser = new User (testEmail, currentUser.getUid(), testPassword, "Volunteer", "forhandsOn1");
                         Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
                         Log.d("Login", "Guest logged in");
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));

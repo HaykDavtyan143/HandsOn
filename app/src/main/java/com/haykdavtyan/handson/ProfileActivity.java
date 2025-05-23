@@ -3,6 +3,7 @@ package com.haykdavtyan.handson;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ public class ProfileActivity extends AppCompatActivity
 
     private TextView Username, Type, bio;
     private Button btnFollowers, btnFollowing, btnPostsCount;
-    private ImageButton btnPosts, btnLiked;
+    private ImageButton btnPosts, btnLiked, edit;
     private RecyclerView recyclerView;
     private FeedAdapter feedAdapter;
     protected List<Post> posts = new ArrayList<>();
@@ -54,23 +56,27 @@ public class ProfileActivity extends AppCompatActivity
         btnFollowing = findViewById(R.id.followingCount);
         btnPosts = findViewById(R.id.btnPosts);
         btnLiked = findViewById(R.id.btnLikedP);
+        edit = findViewById(R.id.edit);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         feedAdapter = new FeedAdapter(this, posts);
         recyclerView.setAdapter(feedAdapter);
+
+        recyclerView.bringToFront();
+        recyclerView.setVisibility(View.VISIBLE);
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         fetchMyPostsFromFirestore();
         loadFollowerAndFollowingCounts();
 
-        bio.post(new Runnable()
+       bio.post(new Runnable()
         {
             @Override
             public void run()
             {
                 int bioHeight = bio.getHeight();
-                int marginTop = (int) (300 * getResources().getDisplayMetrics().density);
+                int marginTop = (int) (250 * getResources().getDisplayMetrics().density);
                 marginTop += bioHeight;
 
                 ViewGroup.MarginLayoutParams recyclerViewParams = (ViewGroup.MarginLayoutParams) recyclerView.getLayoutParams();
@@ -116,6 +122,10 @@ public class ProfileActivity extends AppCompatActivity
             finish();
         });
 
+        edit.setOnClickListener(v -> {
+
+        });
+
     }
 
     public void fetchMyPostsFromFirestore()
@@ -130,6 +140,7 @@ public class ProfileActivity extends AppCompatActivity
             }
 
             db.collection("posts")
+                    .orderBy("creationTime", Query.Direction.DESCENDING)
                     .get()
                     .addOnSuccessListener(querySnapshot -> {
                         posts.clear();
@@ -140,6 +151,11 @@ public class ProfileActivity extends AppCompatActivity
                             {
                                 Post post = document.toObject(Post.class);
                                 post.setCreator(document.getString("creator"));
+                                post.setCreatorId(document.getString("creatorID"));
+                                post.setCreatorType(document.getString("creatorType"));
+                                post.setApproved((document.getBoolean("approved")));
+                                post.setCreationTime(document.getTimestamp("creationTime"));
+                                post.setExpirationTime(document.getTimestamp("expirationTime"));
 
                                 if (document.getId() != null)
                                 {
@@ -166,7 +182,7 @@ public class ProfileActivity extends AppCompatActivity
 
                                 Log.d("ProfileActivity", "Fetched post ID: " + post.getId() + ", Comments: " + post.getComments());
 
-                                if (username.equals(document.getString("creator")))
+                                if ((username.equals(document.getString("creator"))) && (document.getBoolean("approved")))
                                     {
                                         posts.add(post);
                                     }

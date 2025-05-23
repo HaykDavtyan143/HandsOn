@@ -38,7 +38,7 @@ public class ChatActivity extends AppCompatActivity
     FirebaseUser currentUser;
     ChatroomModel chatroomModel;
     String chatroomId;
-    ImageButton send;
+    ImageButton send, back;
     Button newMessages;
     EditText etMessage;
     RecyclerView recyclerView;
@@ -62,6 +62,7 @@ public class ChatActivity extends AppCompatActivity
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         send = findViewById(R.id.send);
+        back = findViewById(R.id.back);
         newMessages = findViewById(R.id.newMessages);
         recyclerView = findViewById(R.id.recyclerView);
         etMessage = findViewById(R.id.message);
@@ -97,6 +98,12 @@ public class ChatActivity extends AppCompatActivity
             intent.putExtra("username", username);
             intent.putExtra("type", getIntent().getStringExtra("type"));
 
+            startActivity(intent);
+            finish();
+        });
+
+        back.setOnClickListener(v -> {
+            Intent intent = new Intent(ChatActivity.this, MessagesActivity.class);
             startActivity(intent);
             finish();
         });

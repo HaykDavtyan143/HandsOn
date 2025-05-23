@@ -41,10 +41,12 @@ public class CommentsFragment extends Fragment {
     private FirebaseFirestore db;
     private String currentUserId;
     private String currentUsername;
+    private String currentType;
 
     private static final String ARG_POST_ID = "post_id";
 
-    public static CommentsFragment newInstance(String postId) {
+    public static CommentsFragment newInstance(String postId)
+    {
         CommentsFragment f = new CommentsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_POST_ID, postId);
@@ -82,8 +84,16 @@ public class CommentsFragment extends Fragment {
                     Log.e("CommentsFragment", "username fetch failed", e);
                 });
 
+        db.collection("users").document(currentUserId)
+                .get()
+                .addOnSuccessListener(d -> currentType = d.exists() ? d.getString("Type") : "none")
+                .addOnFailureListener(e -> {
+                    currentType = "none";
+                    Log.e("CommentsFragment", "type fetch failed", e);
+                });
+
         // Adapter setup
-        commentsAdapter = new CommentsAdapter(commentsMap, commentKeys, postId, currentUserId);
+        commentsAdapter = new CommentsAdapter(requireContext(), commentsMap, commentKeys, postId, currentUserId);
         commentsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentsRecyclerView.setAdapter(commentsAdapter);
 
@@ -97,6 +107,8 @@ public class CommentsFragment extends Fragment {
             Map<String,Object> commentData = new HashMap<>();
             commentData.put("text",    text);
             commentData.put("creator", currentUsername);
+            commentData.put("creatorId", currentUserId);
+            commentData.put("creatorType", currentType);
             commentData.put("likes",   0L);
             commentData.put("likedBy", new HashMap<String, Boolean>());
 

@@ -7,7 +7,12 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -37,9 +42,18 @@ public class FeedActivity extends AppCompatActivity
         feedAdapter = new FeedAdapter(this, posts);
         recyclerView.setAdapter(feedAdapter);
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         feedAdapter.setRecyclerView(recyclerView);
 
-        fetchPostsFromFirestore();
+        if (user.getUid().equals("fwRn6dA7tQMMCOmebDVzY8yUeKp2"))
+        {
+            fetchModeratorPostFromFirestore();
+        }
+        else
+        {
+            fetchPostsFromFirestore();
+        }
 
         if (savedInstanceState == null)
         {
@@ -52,6 +66,7 @@ public class FeedActivity extends AppCompatActivity
     {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("posts")
+                .orderBy("creationTime", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     posts.clear();
@@ -60,37 +75,110 @@ public class FeedActivity extends AppCompatActivity
                     {
                         try
                         {
-                            Post post = document.toObject(Post.class);
-                            post.setCreator(document.getString("creator"));
-                            post.setCreatorId(document.getString("creatorID"));
-                            post.setCreatorType(document.getString("creatorType"));
+                                Post post = document.toObject(Post.class);
+                                post.setCreator(document.getString("creator"));
+                                post.setCreatorId(document.getString("creatorID"));
+                                post.setCreatorType(document.getString("creatorType"));
+                                post.setApproved(document.getBoolean("approved"));
+                                post.setCreationTime(document.getTimestamp("creationTime"));
+                                post.setExpirationTime(document.getTimestamp("expirationTime"));
 
-                            if (document.getId() != null)
+                                if (document.getId() != null)
+                                {
+                                    post.setId(document.getId());
+                                }
+                                else
+                                {
+                                    Log.e("FeedActivity", "Post document ID is null: " + document.getData());
+                                    continue;
+                                }
+
+                                Object commentsObject = document.get("comments");
+
+                                if (commentsObject instanceof Map)
+                                {
+                                    HashMap<String, Object> fixedComments = new HashMap<>((Map<String, Object>) commentsObject);
+                                    post.setComments(fixedComments);
+                                }
+                                else
+                                {
+                                    post.setComments(new HashMap<>());
+                                    Log.e("FeedActivity", "Unexpected comments format: " + commentsObject);
+                                }
+
+                                Log.d("FeedActivity", "Fetched post ID: " + post.getId() + ", Comments: " + post.getComments());
+
+                            if ((document.getBoolean("approved")) && (Timestamp.now().compareTo(post.getExpirationTime()) <= 0))
                             {
-                                post.setId(document.getId());
+                                posts.add(post);
                             }
-                            else
+                        }
+                        catch (Exception e)
+                        {
+                            Log.e("FeedActivity", "Error processing post: " + document.getId(), e);
+                        }
+                    }
+
+                    if (feedAdapter != null)
+                    {
+                        runOnUiThread(() -> feedAdapter.notifyDataSetChanged());
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("FeedActivity", "Error fetching posts", e));
+    }
+
+
+
+    public void fetchModeratorPostFromFirestore()
+    {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("posts")
+                .orderBy("creationTime", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    posts.clear();
+
+                    for (QueryDocumentSnapshot document : querySnapshot)
+                    {
+                        try
+                        {
+                            if (!document.getBoolean("approved"))
                             {
-                                Log.e("FeedActivity", "Post document ID is null: " + document.getData());
-                                continue;
+                                Post post = document.toObject(Post.class);
+                                post.setCreator(document.getString("creator"));
+                                post.setCreatorId(document.getString("creatorID"));
+                                post.setCreatorType(document.getString("creatorType"));
+                                post.setApproved(document.getBoolean("approved"));
+                                post.setCreationTime(document.getTimestamp("creationTime"));
+                                post.setExpirationTime(document.getTimestamp("expirationTime"));
+
+                                if (document.getId() != null)
+                                {
+                                    post.setId(document.getId());
+                                }
+                                else
+                                {
+                                    Log.e("FeedActivity", "Post document ID is null: " + document.getData());
+                                    continue;
+                                }
+
+                                Object commentsObject = document.get("comments");
+
+                                if (commentsObject instanceof Map)
+                                {
+                                    HashMap<String, Object> fixedComments = new HashMap<>((Map<String, Object>) commentsObject);
+                                    post.setComments(fixedComments);
+                                }
+                                else
+                                {
+                                    post.setComments(new HashMap<>());
+                                    Log.e("FeedActivity", "Unexpected comments format: " + commentsObject);
+                                }
+
+                                Log.d("FeedActivity", "Fetched post ID: " + post.getId() + ", Comments: " + post.getComments());
+
+                                posts.add(post);
                             }
-
-                            Object commentsObject = document.get("comments");
-
-                            if (commentsObject instanceof Map)
-                            {
-                                HashMap<String, Object> fixedComments = new HashMap<>((Map<String, Object>) commentsObject);
-                                post.setComments(fixedComments);
-                            }
-                            else
-                            {
-                                post.setComments(new HashMap<>());
-                                Log.e("FeedActivity", "Unexpected comments format: " + commentsObject);
-                            }
-
-                            Log.d("FeedActivity", "Fetched post ID: " + post.getId() + ", Comments: " + post.getComments());
-
-                            posts.add(post);
 
                         }
                         catch (Exception e)

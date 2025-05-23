@@ -1,5 +1,7 @@
 package com.haykdavtyan.handson;
 
+import com.google.firebase.Timestamp;
+
 import java.util.HashMap;
 
 public class Post
@@ -8,7 +10,9 @@ public class Post
     private String title;
     private String creator;
     private String creatorId;
-
+    private boolean approved;
+    private Timestamp creationTime;
+    private Timestamp expirationTime;
     private String creatorType;
     private String description;
     private HashMap<String, Object> comments;
@@ -115,6 +119,30 @@ public class Post
     public void setLikes(int likes)
     {
         this.likes = likes;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+
+    public Timestamp getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Timestamp creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public Timestamp getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void setExpirationTime(Timestamp expirationTime) {
+        this.expirationTime = expirationTime;
     }
 
     public void addComment(Object comment)
