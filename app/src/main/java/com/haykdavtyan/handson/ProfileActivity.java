@@ -260,6 +260,9 @@ public class ProfileActivity extends AppCompatActivity
                             .setTextColor(getResources().getColor(android.R.color.holo_red_dark));
                     alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
                             .setTextColor(getResources().getColor(android.R.color.black));
+
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setAllCaps(false);
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setAllCaps(false);
                 });
 
                 dialog.show();

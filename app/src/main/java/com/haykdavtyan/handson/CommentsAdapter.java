@@ -85,7 +85,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                 context.startActivity(intent);
             });
 
-            if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(creatorId))
+            if ((FirebaseAuth.getInstance().getCurrentUser().getUid().equals(creatorId))
+                    || (FirebaseAuth.getInstance().getCurrentUser().getUid().equals("fwRn6dA7tQMMCOmebDVzY8yUeKp2")))
             {
                 holder.delete.setVisibility(View.VISIBLE);
             }
@@ -96,7 +97,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
             holder.delete.setOnClickListener(v -> {
                 androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(context)
-                        .setMessage("Are you sure?")
+                        .setMessage("Are you sure you want to delete this comment?")
                         .setPositiveButton("Delete", (dialogInterface, which) -> {
                             Map<String, Object> updates = new HashMap<>();
                             updates.put("comments." + commentKey, FieldValue.delete());

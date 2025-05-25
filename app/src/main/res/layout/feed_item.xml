@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
+    android:layout_marginTop="3dp"
     android:background="@drawable/bg_edittext"
     android:elevation="3dp"
     android:layout_margin="7dp">
@@ -143,6 +144,52 @@
         app:layout_constraintTop_toTopOf="@id/comment_button"
         app:layout_constraintBottom_toBottomOf="@id/comment_button" />
 
+    <!-- Inside feed_item.xml, probably near the bottom -->
+    <LinearLayout
+        android:id="@+id/comment_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/comment_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/comments_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:scrollbars="vertical"
+            android:nestedScrollingEnabled="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/comment_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_edittext"
+                android:inputType="textMultiLine"
+                android:layout_weight="1"
+                app:elevation="6dp"
+                android:hint="Write a comment" />
+
+            <ImageButton
+                android:id="@+id/post_comment_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:background="@android:color/transparent"
+                android:src="@drawable/postcomment"/>
+        </LinearLayout>
+    </LinearLayout>
+
+
     <Button
         android:id="@+id/approve"
         android:layout_width="150dp"
@@ -151,7 +198,8 @@
         android:text="Approve"
         app:backgroundTint="@color/handson"
         android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/like_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/comment_section"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <ImageButton
@@ -159,14 +207,15 @@
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:padding="5dp"
+        android:layout_marginTop="5dp"
         android:scaleType="fitCenter"
-        android:layout_marginEnd="5dp"
+        android:layout_marginEnd="0dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:srcCompat="@drawable/delete"
         app:backgroundTint="@color/red"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/comment_button"/>
+        app:layout_constraintTop_toBottomOf="@id/comment_section"/>
 
     <TextView
         android:id="@+id/expired"

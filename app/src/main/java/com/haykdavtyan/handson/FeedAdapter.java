@@ -6,12 +6,16 @@ import static android.app.PendingIntent.getActivity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +34,9 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -136,21 +142,109 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         });
 
         holder.commentButton.setOnClickListener(v -> {
-            String postId = post.getId(); // Or post.getId(), depending on your model
+            if (holder.commentSection.getVisibility() == View.VISIBLE) {
+                holder.commentButton.setColorFilter(null);
+                holder.commentSection.setVisibility(View.GONE);
 
-            // Get the hosting activity
-            AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                holder.commentInput.clearFocus();
 
-            // Create the fragment with postId
-            CommentsFragment commentsFragment = CommentsFragment.newInstance(postId);
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null && holder.commentInput != null) {
+                    imm.hideSoftInputFromWindow(holder.commentInput.getWindowToken(), 0);
+                }
 
-            // Open the fragment
-            activity.getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, commentsFragment) // Replace with your actual container ID
-                    .addToBackStack(null)
-                    .commit();
+            } else {
+                holder.commentButton.setColorFilter(ContextCompat.getColor(context, R.color.handson), PorterDuff.Mode.SRC_IN);
+
+
+                holder.commentSection.setVisibility(View.VISIBLE);
+
+                holder.commentInput.requestFocus(); // focus on input
+                holder.commentsRecyclerView.setNestedScrollingEnabled(true);
+
+                holder.commentsRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+                holder.commentsRecyclerView.setNestedScrollingEnabled(true);
+
+                recyclerView.setNestedScrollingEnabled(true);
+
+                // Let layout update first before scrolling
+                holder.itemView.post(() -> {
+                    if (recyclerView != null) {
+                        recyclerView.smoothScrollToPosition(holder.getAdapterPosition());
+                    }
+
+                    // Show keyboard (optional)
+                    InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.showSoftInput(holder.commentInput, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                });
+
+                // Setup Firestore references
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                String postId = post.getId();
+                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                // Setup comments list
+                Map<String, Map<String, Object>> commentsMap = new LinkedHashMap<>();
+                List<String> commentKeys = new ArrayList<>();
+
+                CommentsAdapter commentsAdapter = new CommentsAdapter(context, commentsMap, commentKeys, postId, currentUserId);
+                holder.commentsRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+                holder.commentsRecyclerView.setAdapter(commentsAdapter);
+                holder.commentsRecyclerView.setNestedScrollingEnabled(true);
+
+                holder.commentsRecyclerView.setOnTouchListener((vv, event) -> {
+                    vv.getParent().requestDisallowInterceptTouchEvent(true);
+                    return false;
+                });
+
+                // Load comments
+                db.collection("posts").document(postId).get()
+                        .addOnSuccessListener(doc -> {
+                            Object raw = doc.get("comments");
+                            if (raw instanceof Map) {
+                                Map<String, Object> outer = (Map<String, Object>) raw;
+                                commentsMap.clear();
+                                commentKeys.clear();
+                                for (Map.Entry<String, Object> e : outer.entrySet()) {
+                                    if (e.getValue() instanceof Map) {
+                                        commentsMap.put(e.getKey(), (Map<String, Object>) e.getValue());
+                                    }
+                                }
+                                commentKeys.addAll(commentsMap.keySet());
+                                commentsAdapter.notifyDataSetChanged();
+                            }
+                        });
+
+                // Post new comment
+                holder.postCommentButton.setOnClickListener(postView -> {
+                    String text = holder.commentInput.getText().toString().trim();
+                    if (text.isEmpty()) return;
+
+                    String key = String.valueOf(System.currentTimeMillis());
+                    Map<String,Object> commentData = new HashMap<>();
+                    commentData.put("text", text);
+                    commentData.put("creator", post.getCreator());  // you may need to pass this to the adapter
+                    commentData.put("creatorId", currentUserId);
+                    commentData.put("creatorType", String.valueOf(post.getCreatorType())); // same, pass this in or re-fetch
+                    commentData.put("likes", 0L);
+                    commentData.put("likedBy", new HashMap<String, Boolean>());
+
+                    db.collection("posts").document(postId)
+                            .update("comments." + key, commentData)
+                            .addOnSuccessListener(a -> {
+                                commentsMap.put(key, commentData);
+                                commentKeys.clear();
+                                commentKeys.addAll(commentsMap.keySet());
+                                commentsAdapter.notifyDataSetChanged();
+                                holder.commentsRecyclerView.scrollToPosition(commentKeys.size() - 1);
+                                holder.commentInput.setText("");
+                            });
+                });
+            }
         });
+
 
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -215,6 +309,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 // Set Cancel button color to black
                 dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
                         .setTextColor(context.getResources().getColor(android.R.color.black));
+
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setAllCaps(false);
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setAllCaps(false);
             });
 
             dialog.show();
@@ -355,6 +452,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         TextView creator, creatorType, created, expires, expired, title, description, commentCount, likeCount, category;
         ImageButton commentButton, likeButton, delete;
         Button approve;
+
+        LinearLayout commentSection;
+        RecyclerView commentsRecyclerView;
+        EditText commentInput;
+        ImageButton postCommentButton;
+
         public FeedViewHolder(@NonNull View itemView)
         {
             super(itemView);
@@ -372,6 +475,11 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             likeButton = itemView.findViewById(R.id.like_button);
             delete = itemView.findViewById(R.id.delete);
             approve = itemView.findViewById(R.id.approve);
+
+            commentSection = itemView.findViewById(R.id.comment_section);
+            commentsRecyclerView = itemView.findViewById(R.id.comments_recycler_view);
+            commentInput = itemView.findViewById(R.id.comment_input);
+            postCommentButton = itemView.findViewById(R.id.post_comment_button);
         }
     }
 
