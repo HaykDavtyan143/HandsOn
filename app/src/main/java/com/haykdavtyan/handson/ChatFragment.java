@@ -1,15 +1,11 @@
 package com.haykdavtyan.handson;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,25 +13,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.Inflater;
+public class ChatFragment extends Fragment {
 
-public class ChatFragment extends Fragment
-{
-    RecyclerView recyclerView;
-    RecentChatRecyclerAdapter adapter;
-    FirebaseUser currUser;
+    private RecyclerView recyclerView;
+    private RecentChatRecyclerAdapter adapter;
+    private FirebaseUser currUser;
 
-    public ChatFragment () {}
+    public ChatFragment() {}
 
     @Override
-    public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         currUser = FirebaseAuth.getInstance().getCurrentUser();
 
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
@@ -43,8 +33,8 @@ public class ChatFragment extends Fragment
         setupRecyclerView();
         return view;
     }
-    private void setupRecyclerView()
-    {
+
+    private void setupRecyclerView() {
         Query query = FirebaseFirestore.getInstance()
                 .collection("chatrooms")
                 .whereArrayContains("userIds", currUser.getUid())
@@ -54,27 +44,31 @@ public class ChatFragment extends Fragment
                 .setQuery(query, ChatroomModel.class)
                 .build();
 
-        adapter = new RecentChatRecyclerAdapter(options, getContext());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(adapter);
-        adapter.startListening();
+        recyclerView.post(() -> {
+            adapter = new RecentChatRecyclerAdapter(options, requireContext());
+            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+            recyclerView.setAdapter(adapter);
+            adapter.startListening();
+        });
     }
+
 
     @Override
     public void onStart() {
         super.onStart();
-        if (adapter != null) adapter.startListening();
+        if (adapter != null && recyclerView.getAdapter() == null) {
+            recyclerView.setAdapter(adapter);
+            adapter.startListening();
+        }
     }
+
 
     @Override
     public void onStop() {
+        if (adapter != null) {
+            adapter.stopListening();
+            Log.d("ChatFragment", "Adapter stopped listening");
+        }
         super.onStop();
-        if (adapter != null) adapter.stopListening();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (adapter != null) adapter.startListening();
     }
 }

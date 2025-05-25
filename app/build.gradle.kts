@@ -1,3 +1,5 @@
+// build.gradle.kts (App level)
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
@@ -38,20 +40,24 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.firebase.auth)
-    implementation("com.google.firebase:firebase-firestore")
     implementation(libs.gridlayout)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    implementation("com.firebaseui:firebase-ui-firestore:9.0.0")
-    implementation("com.google.firebase:firebase-storage:20.2.1")
-    implementation("com.google.firebase:firebase-auth:22.1.1")
-    implementation("com.google.firebase:firebase-auth:21.0.1")
-    implementation("com.google.firebase:firebase-firestore:24.7.1")
+    // Firebase BoM to manage versions
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation("com.google.android.gms:play-services-base:18.2.0")
+
+    // Firebase services (no versions needed)
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth:22.1.1")
+
+    // FirebaseUI for Firestore
+    implementation("com.firebaseui:firebase-ui-firestore:9.0.0")
+
+    // Play services base (optional but often useful)
+    implementation("com.google.android.gms:play-services-base:18.2.0")
 }

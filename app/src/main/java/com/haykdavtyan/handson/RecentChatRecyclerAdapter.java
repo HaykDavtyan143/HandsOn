@@ -34,12 +34,20 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<Chatroom
         this.context = context;
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         db = FirebaseFirestore.getInstance();
+        setHasStableIds(true);
 
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getSnapshots().getSnapshot(position).getId().hashCode();
     }
 
     @Override
     protected void onBindViewHolder(@NonNull ChatroomModelViewHolder holder, int position, @NonNull ChatroomModel model)
     {
+        if (model.getUserIds() == null || model.getUserIds().size() < 2) return;
+
         if (model.getUserIds().get(0).equals(currentUser.getUid()))
         {
             ref = FirebaseFirestore.getInstance().collection("users").document(model.getUserIds().get(1));
