@@ -39,7 +39,7 @@
         android:id="@+id/edit_bio"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="bio"
+        android:hint="Bio"
         android:padding="12dp"
         android:inputType="textMultiLine"
         android:textColorHint="@color/text_secondary"
