@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -43,7 +44,7 @@ public class ChatActivity extends AppCompatActivity
     EditText etMessage;
     RecyclerView recyclerView;
     TextView type;
-    Button btnUsername;
+    TextView btnUsername;
     String username;
     String userID;
     String currUserId;
@@ -77,6 +78,13 @@ public class ChatActivity extends AppCompatActivity
 
         btnUsername.setText(username);
         type.setText(getIntent().getStringExtra("type"));
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+
+            }
+        });
 
         send.setOnClickListener(v -> {
             String message = etMessage.getText().toString().trim();

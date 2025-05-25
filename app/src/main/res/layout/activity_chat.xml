@@ -10,23 +10,24 @@
     <RelativeLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="75dp"
         android:background="@color/handson"
         android:padding="10dp">
 
         <ImageButton
             android:id="@+id/back"
-            android:layout_width="40dp"
+            android:layout_width="53dp"
             android:layout_height="48dp"
             android:src="@drawable/back"
-            app:tint="@color/darkGray"
             android:scaleType="centerInside"
             android:background="@null"
+            app:tint="@color/background_light"
             android:padding="1dp"
+            android:layout_marginStart="-7dp"
             android:layout_alignParentStart="true"
             android:layout_centerInParent="true"/>
 
-        <Button
+        <TextView
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,26 +35,23 @@
             android:textStyle="bold"
             android:textColor="@color/background_light"
             android:background="@android:color/transparent"
-            android:textSize="23sp"
-            android:padding="0dp"
-            android:insetLeft="0dp"
-            android:insetRight="0dp"
+            android:textSize="25sp"
             android:layout_marginLeft="18dp"
-            android:gravity="center_vertical"
-            android:layout_toRightOf="@+id/back"
-            android:layout_centerVertical="true"/>
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentEnd="true" />
 
         <TextView
             android:id="@+id/type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Type"
-            android:textStyle="bold"
-            android:textColor="@color/darkGray"
-            android:textSize="18sp"
+            android:textStyle="italic"
+            android:textColor="@color/black"
+            android:textSize="13sp"
             android:layout_marginLeft="35dp"
-            android:layout_toRightOf="@+id/username"
-            android:layout_centerVertical="true"/>
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:layout_below="@+id/username"/>
     </RelativeLayout>
     
     <androidx.recyclerview.widget.RecyclerView
