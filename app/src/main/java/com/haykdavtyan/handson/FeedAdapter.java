@@ -165,7 +165,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 holder.commentsRecyclerView.setLayoutManager(new LinearLayoutManager(context));
                 holder.commentsRecyclerView.setNestedScrollingEnabled(true);
 
-                recyclerView.setNestedScrollingEnabled(true);
+                holder.commentsRecyclerView.setNestedScrollingEnabled(true);
 
                 // Let layout update first before scrolling
                 holder.itemView.post(() -> {
