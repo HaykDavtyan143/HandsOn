@@ -1,14 +1,25 @@
 package com.haykdavtyan.handson;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +32,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +46,7 @@ public class ProfileActivity extends AppCompatActivity
 
     private TextView Username, Type, bio;
     private Button btnFollowers, btnFollowing, btnPostsCount;
-    private ImageButton btnPosts, btnLiked, edit;
+    private ImageButton btnPosts, btnLiked, settings;
     private RecyclerView recyclerView;
     private FeedAdapter feedAdapter;
     protected List<Post> posts = new ArrayList<>();
@@ -56,7 +70,7 @@ public class ProfileActivity extends AppCompatActivity
         btnFollowing = findViewById(R.id.followingCount);
         btnPosts = findViewById(R.id.btnPosts);
         btnLiked = findViewById(R.id.btnLikedP);
-        edit = findViewById(R.id.edit);
+        settings = findViewById(R.id.settings_button);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         feedAdapter = new FeedAdapter(this, posts);
@@ -100,6 +114,10 @@ public class ProfileActivity extends AppCompatActivity
             Type.setText(accType);
         });
 
+        fetchCurrentBio(fetchedBio -> {
+            bio.setText(fetchedBio);
+        });
+
         btnPosts.setOnClickListener(v -> {
             fetchMyPostsFromFirestore();
         });
@@ -122,9 +140,134 @@ public class ProfileActivity extends AppCompatActivity
             finish();
         });
 
-        edit.setOnClickListener(v -> {
-            Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+        settings.setOnClickListener(view -> {
+            View popupView = LayoutInflater.from(this).inflate(R.layout.menu_popup, null);
+            PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+            popupWindow.setElevation(10);
+            popupWindow.setOutsideTouchable(true);
+            popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            popupWindow.showAsDropDown(settings, -30, 10); // Adjust offset as needed
+
+            popupView.findViewById(R.id.edit_profile).setOnClickListener(v -> {
+                startActivity(new Intent(this, EditProfileActivity.class));
+                popupWindow.dismiss();
+            });
+
+            popupView.findViewById(R.id.logout).setOnClickListener(v -> {
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+                popupWindow.dismiss();
+            });
+
+            popupView.findViewById(R.id.delete_account).setOnClickListener(v -> {
+                AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
+                        .setMessage("Are you sure you want to delete your profile?")
+                        .setPositiveButton("Delete", (dialogInterface, which) -> {
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            if (user == null) return;
+
+                            String uid = user.getUid();
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                            db.collection("users").document(uid).delete()
+                                    .addOnSuccessListener(aVoid -> db.collection("posts")
+                                            .whereEqualTo("creatorId", uid)
+                                            .get()
+                                            .addOnSuccessListener(postSnapshots -> {
+                                                WriteBatch postBatch = db.batch();
+                                                for (DocumentSnapshot doc : postSnapshots) {
+                                                    postBatch.delete(doc.getReference());
+                                                }
+                                                postBatch.commit()
+                                                        .addOnSuccessListener(unused -> db.collection("chatrooms")
+                                                                .whereArrayContains("userIds", uid)
+                                                                .get()
+                                                                .addOnSuccessListener(chatSnapshots -> {
+                                                                    WriteBatch chatBatch = db.batch();
+                                                                    for (DocumentSnapshot doc : chatSnapshots) {
+                                                                        chatBatch.delete(doc.getReference());
+                                                                    }
+                                                                    chatBatch.commit()
+                                                                            .addOnSuccessListener(unused2 -> db.collection("posts")
+                                                                                    .get()
+                                                                                    .addOnSuccessListener(allPosts -> {
+                                                                                        WriteBatch commentBatch = db.batch();
+                                                                                        for (DocumentSnapshot post : allPosts) {
+                                                                                            Map<String, Object> comments = (Map<String, Object>) post.get("comments");
+                                                                                            if (comments != null) {
+                                                                                                Map<String, Object> updatedComments = new HashMap<>(comments);
+                                                                                                boolean changed = false;
+                                                                                                for (Map.Entry<String, Object> entry : comments.entrySet()) {
+                                                                                                    Map<String, Object> commentData = (Map<String, Object>) entry.getValue();
+                                                                                                    if (uid.equals(commentData.get("creatorId"))) {
+                                                                                                        updatedComments.remove(entry.getKey());
+                                                                                                        changed = true;
+                                                                                                    }
+                                                                                                }
+                                                                                                if (changed) {
+                                                                                                    commentBatch.update(post.getReference(), "comments", updatedComments);
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                        commentBatch.commit()
+                                                                                                .addOnSuccessListener(unused3 -> user.delete()
+                                                                                                        .addOnSuccessListener(unused4 -> {
+                                                                                                            Toast.makeText(ProfileActivity.this, "Account deleted", Toast.LENGTH_SHORT).show();
+                                                                                                            startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+                                                                                                            finish();
+                                                                                                        })
+                                                                                                        .addOnFailureListener(e ->
+                                                                                                                Toast.makeText(ProfileActivity.this, "Auth delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                                                                                        ))
+                                                                                                .addOnFailureListener(e ->
+                                                                                                        Toast.makeText(ProfileActivity.this, "Failed deleting comments: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                                                                                );
+                                                                                    })
+                                                                                    .addOnFailureListener(e ->
+                                                                                            Toast.makeText(ProfileActivity.this, "Error getting posts for comment cleanup: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                                                                    ))
+                                                                            .addOnFailureListener(e ->
+                                                                                    Toast.makeText(ProfileActivity.this, "Failed deleting chatrooms: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                                                            );
+                                                                })
+                                                                .addOnFailureListener(e ->
+                                                                        Toast.makeText(ProfileActivity.this, "Failed getting chatrooms: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                                                ))
+                                                        .addOnFailureListener(e ->
+                                                                Toast.makeText(ProfileActivity.this, "Failed deleting posts: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                                        );
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    Toast.makeText(ProfileActivity.this, "Error getting user posts: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                            ))
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(ProfileActivity.this, "Failed deleting user doc: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                    );
+
+                            dialogInterface.dismiss();
+                            popupWindow.dismiss();
+                        })
+                        .setNegativeButton("Cancel", (dialogInterface, which) -> {
+                            dialogInterface.dismiss();
+                        })
+                        .create();
+
+                dialog.setOnShowListener(dialogInterface -> {
+                    AlertDialog alertDialog = (AlertDialog) dialogInterface;
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                            .setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                    alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                            .setTextColor(getResources().getColor(android.R.color.black));
+                });
+
+                dialog.show();
+            });
+
+
         });
+
 
     }
 
@@ -338,6 +481,35 @@ public class ProfileActivity extends AppCompatActivity
         else
         {
             callback.onUsernameRetrieved(null);
+        }
+    }
+
+    private void fetchCurrentBio(BioCallback callback)
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null)
+        {
+            String uid = user.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference userRef = db.collection("users").document(uid);
+
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists())
+                {
+                    DocumentSnapshot document = task.getResult();
+                    String fetchedBio = document.getString("Bio");
+                    callback.onBioRetrieved(fetchedBio);
+                }
+                else
+                {
+                    callback.onBioRetrieved(null);
+                }
+            });
+        }
+        else
+        {
+            callback.onBioRetrieved(null);
         }
     }
 

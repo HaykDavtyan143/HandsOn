@@ -1,10 +1,13 @@
 package com.haykdavtyan.handson;
 
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -19,9 +22,10 @@ import java.util.Map;
 
 public class EditProfileActivity extends AppCompatActivity {
 
-    private EditText editUsername, editPassword;
+    private EditText editUsername, editBio, editPassword;
     private RadioGroup radioGroup;
     private RadioButton volunteerRadio, organizationRadio;
+    private ImageButton passwordToggle;
     private Button saveButton;
 
     private FirebaseAuth auth;
@@ -42,24 +46,41 @@ public class EditProfileActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         editUsername = findViewById(R.id.edit_username);
+        editBio = findViewById(R.id.edit_bio);
         editPassword = findViewById(R.id.edit_password);
         radioGroup = findViewById(R.id.check);
+        passwordToggle = findViewById(R.id.password_Toggle);
         volunteerRadio = findViewById(R.id.volunteer);
         organizationRadio = findViewById(R.id.organization);
         saveButton = findViewById(R.id.button_save);
+
+        passwordToggle.setOnClickListener(v -> {
+            if (editPassword.getTransformationMethod() instanceof PasswordTransformationMethod)
+            {
+                editPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                passwordToggle.setImageResource(R.drawable.ic_eye_open);
+            }
+            else
+            {
+                editPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                passwordToggle.setImageResource(R.drawable.ic_eye_closed);
+            }
+
+            editPassword.setSelection(editPassword.getText().length());
+        });
 
         saveButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-
                 String newUsername = editUsername.getText().toString().trim();
                 String newPassword = editPassword.getText().toString().trim();
+                String newBio = editBio.getText().toString().trim();
                 String newType = volunteerRadio.isChecked() ? "Volunteer" :
                         organizationRadio.isChecked() ? "Organization" : "";
 
-                if (newUsername.isEmpty() || newPassword.isEmpty() || newType.isEmpty())
+                if (newUsername.isEmpty() || newPassword.isEmpty() || newType.isEmpty() || newBio.isEmpty())
                 {
                     Toast.makeText(EditProfileActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
                     return;
@@ -77,6 +98,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 updates.put("Username", newUsername);
                 updates.put("password", newPassword);
                 updates.put("Type", newType);
+                updates.put("Bio", newBio);
 
                 db.collection("users").document(uid)
                         .update(updates)

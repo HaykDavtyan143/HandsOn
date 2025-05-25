@@ -2,10 +2,20 @@
     <!-- Base application theme for Light Mode -->
     <style name="Base.Theme.HandsOn" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here -->
+        <item name="colorPrimary">@color/handson</item>
         <!-- Example: -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
     <!-- You can also customize further if necessary -->
     <style name="Theme.HandsOn" parent="Base.Theme.HandsOn" />
+
+    <style name="PopupMenuTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="popupMenuStyle">@style/CustomPopupMenu</item>
+    </style>
+
+    <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">#F0F0F0</item>
+    </style>
+
 </resources>

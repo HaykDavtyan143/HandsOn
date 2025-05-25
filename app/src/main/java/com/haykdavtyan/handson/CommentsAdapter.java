@@ -14,6 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -82,6 +84,55 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                 intent.putExtra("creatorType", creatorType);
                 context.startActivity(intent);
             });
+
+            if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(creatorId))
+            {
+                holder.delete.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                holder.delete.setVisibility(View.GONE);
+            }
+
+            holder.delete.setOnClickListener(v -> {
+                androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(context)
+                        .setMessage("Are you sure?")
+                        .setPositiveButton("Delete", (dialogInterface, which) -> {
+                            Map<String, Object> updates = new HashMap<>();
+                            updates.put("comments." + commentKey, FieldValue.delete());
+
+                            db.collection("posts").document(postId)
+                                    .update(updates)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(context, "Comment deleted", Toast.LENGTH_SHORT).show();
+
+                                        commentsMap.remove(commentKey);
+                                        commentKeys.remove(position);
+                                        notifyItemRemoved(position);
+                                        notifyItemRangeChanged(position, commentKeys.size());
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(context, "Failed to delete comment", Toast.LENGTH_SHORT).show();
+                                    });
+                        })
+                        .setNegativeButton("Cancel", (dialogInterface, which) -> {
+                            // This dismisses the dialog immediately on cancel click
+                            dialogInterface.dismiss();
+                        })
+                        .create();
+
+                dialog.setOnShowListener(dialogInterface -> {
+                    // Set Delete button red color
+                    dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                            .setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+
+                    // Set Cancel button black color
+                    dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+                            .setTextColor(context.getResources().getColor(android.R.color.black));
+                });
+
+                dialog.show();
+            });
         }
 
         // 2) Load likes & likedBy
@@ -133,7 +184,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     static class CommentViewHolder extends RecyclerView.ViewHolder {
         TextView commentText;
         Button creatorNameButton;
-        ImageButton likeButton;
+        ImageButton likeButton, delete;
         TextView likeCount;
 
         public CommentViewHolder(@NonNull View itemView) {
@@ -141,6 +192,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             commentText = itemView.findViewById(R.id.comment_text);
             creatorNameButton = itemView.findViewById(R.id.creator_name_button);
             likeButton = itemView.findViewById(R.id.like_button);
+            delete = itemView.findViewById(R.id.delete);
             likeCount = itemView.findViewById(R.id.like_count);
         }
     }

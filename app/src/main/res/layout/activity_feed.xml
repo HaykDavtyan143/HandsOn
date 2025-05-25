@@ -6,6 +6,49 @@
     android:layout_height="match_parent"
     tools:context=".FeedActivity">
 
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@color/handson"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/handson"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:tint="@color/background_light"
+            android:src="@drawable/handson"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HandsOn"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="@color/background_light"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/handson"/>
+
+        <ImageButton
+            android:id="@+id/filter"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:padding="0dp"
+            android:contentDescription="Filter"
+            app:tint="@color/background_light"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_filter"
+            android:layout_marginEnd="15dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -15,6 +58,7 @@
         app:layout_constraintBottom_toTopOf="@id/navigationBarFragment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="45dp"
         android:layout_marginBottom="45dp"/>
 
     <FrameLayout
@@ -34,4 +78,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

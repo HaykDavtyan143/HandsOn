@@ -3,9 +3,12 @@ package com.haykdavtyan.handson;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import androidx.gridlayout.widget.GridLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +52,9 @@ public class AddPostActivity extends AppCompatActivity
         editTextDescription = findViewById(R.id.edit_text_description);
         buttonAddPost = findViewById(R.id.button_add_post);
 
+        GridLayout gridLayout = findViewById(R.id.select);
+        int childCount = gridLayout.getChildCount();
+
         feedActivity = new FeedActivity();
 
         buttonAddPost.setOnClickListener(v -> addPostToFirestore());
@@ -59,6 +65,24 @@ public class AddPostActivity extends AppCompatActivity
                     .replace(R.id.fragment_container, new NavigationBarFragment())
                     .commit();
         }
+
+        for (int i = 0; i < childCount; i++) {
+            View child = gridLayout.getChildAt(i);
+            if (child instanceof RadioButton) {
+                RadioButton rb = (RadioButton) child;
+                rb.setOnClickListener(v -> {
+                    // Uncheck all other RadioButtons
+                    for (int j = 0; j < childCount; j++) {
+                        View otherChild = gridLayout.getChildAt(j);
+                        if (otherChild instanceof RadioButton && otherChild != v) {
+                            ((RadioButton) otherChild).setChecked(false);
+                        }
+                    }
+                    rb.setChecked(true);
+                });
+            }
+        }
+
 
         TextView expirationDateView = findViewById(R.id.text_view_expiration_date);
 
@@ -133,6 +157,13 @@ public class AddPostActivity extends AppCompatActivity
             return;
         }
 
+        String category = getSelectedCategory();
+
+        if (category == null) {
+            Toast.makeText(this, "Please select a post category", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         fetchCurrentUsername(username -> {
             if (username != null)
             {
@@ -153,6 +184,7 @@ public class AddPostActivity extends AppCompatActivity
                 post.put("creatorType", type);
                 post.put("creationTime", Timestamp.now());
                 post.put("expirationTime", expirationTimestamp);
+                post.put("Category", category);
                 post.put("approved", false);
 
                 db.collection("posts")
@@ -232,4 +264,25 @@ public class AddPostActivity extends AppCompatActivity
             callback.onUsernameRetrieved(null);
         }
     }
+
+    private String getSelectedCategory()
+    {
+        GridLayout gridLayout = findViewById(R.id.select);
+        int childCount = gridLayout.getChildCount();
+
+        for (int i = 0; i < childCount; i++)
+        {
+            View child = gridLayout.getChildAt(i);
+            if (child instanceof RadioButton)
+            {
+                RadioButton rb = (RadioButton) child;
+                if (rb.isChecked())
+                {
+                    return rb.getText().toString();
+                }
+            }
+        }
+        return null;
+    }
+
 }

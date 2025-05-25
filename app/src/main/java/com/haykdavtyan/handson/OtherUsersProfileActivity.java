@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -120,6 +121,17 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
                     .commit();
         }
 
+        fetchCurrentBio(fetchedBio -> {
+            if (fetchedBio != null)
+            {
+                bio.setText(fetchedBio);
+            }
+            else
+            {
+                bio.setText("None");
+            }
+        }, creatorID);
+
         btnFollowers.setOnClickListener(v -> {
             Intent intent = new Intent(OtherUsersProfileActivity.this, FollowersActivity.class);
             intent.putExtra("userId", creatorID);
@@ -146,6 +158,33 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
         btnFollow.setOnClickListener(v -> handleFollowButtonClick());
     }
 
+    private void fetchCurrentBio(BioCallback callback, String userId)
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null)
+        {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference userRef = db.collection("users").document(userId);
+
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists())
+                {
+                    DocumentSnapshot document = task.getResult();
+                    String fetchedBio = document.getString("Bio");
+                    callback.onBioRetrieved(fetchedBio);
+                }
+                else
+                {
+                    callback.onBioRetrieved(null);
+                }
+            });
+        }
+        else
+        {
+            callback.onBioRetrieved(null);
+        }
+    }
     public void fetchUsersPostsFromFirestore(String username)
     {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

@@ -2,8 +2,8 @@ package com.haykdavtyan.handson;
 
 import static android.app.PendingIntent.getActivity;
 
-import static androidx.core.content.ContextCompat.startActivity;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -13,9 +13,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -79,37 +81,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             }
         });
 
-        if (Timestamp.now().compareTo(post.getExpirationTime()) > 0)
-        {
-            holder.creator.setVisibility(View.GONE);
-            holder.creatorType.setVisibility(View.GONE);
-            holder.created.setVisibility(View.GONE);
-            holder.expires.setVisibility(View.GONE);
-            holder.title.setVisibility(View.GONE);
-            holder.description.setVisibility(View.GONE);
-            holder.likeButton.setVisibility(View.GONE);
-            holder.likeCount.setVisibility(View.GONE);
-            holder.commentButton.setVisibility(View.GONE);
-            holder.commentCount.setVisibility(View.GONE);
-            holder.approve.setVisibility(View.GONE);
-
-            holder.expired.setVisibility(View.VISIBLE);
-
-            holder.expired.setOnClickListener(v -> {
-                holder.creator.setVisibility(View.VISIBLE);
-                holder.creatorType.setVisibility(View.VISIBLE);
-                holder.created.setVisibility(View.VISIBLE);
-                holder.expires.setVisibility(View.VISIBLE);
-                holder.title.setVisibility(View.VISIBLE);
-                holder.description.setVisibility(View.VISIBLE);
-                holder.likeButton.setVisibility(View.VISIBLE);
-                holder.likeCount.setVisibility(View.VISIBLE);
-                holder.commentButton.setVisibility(View.VISIBLE);
-                holder.commentCount.setVisibility(View.VISIBLE);
-
-                holder.expired.setVisibility(View.GONE);
-            });
-        }
 
         holder.likeCount.setText(String.valueOf(post.getLikes()));
 
@@ -121,13 +92,33 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         holder.expires.setText("Expires: " + new SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
                 .format(post.getExpirationTime().toDate()));
 
-        if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals("fwRn6dA7tQMMCOmebDVzY8yUeKp2"))
+        holder.category.setText("Category: " + post.getCategory());
+
+        if (Timestamp.now().compareTo(post.getExpirationTime()) > 0)
         {
-            holder.approve.setVisibility(View.GONE);
+            holder.expired.setVisibility(View.VISIBLE);
+        }
+
+        if ((FirebaseAuth.getInstance().getCurrentUser().getUid().equals("fwRn6dA7tQMMCOmebDVzY8yUeKp2")) &&
+                (Timestamp.now().compareTo(post.getExpirationTime()) <= 0))
+        {
+            holder.approve.setVisibility(View.VISIBLE);
+            holder.delete.setVisibility(View.VISIBLE);
         }
         else
         {
-            holder.approve.setVisibility(View.VISIBLE);
+            holder.approve.setVisibility(View.GONE);
+        }
+
+        if (((FirebaseAuth.getInstance().getCurrentUser().getUid().equals(post.getCreatorId()))
+                || (FirebaseAuth.getInstance().getCurrentUser().getUid().equals("fwRn6dA7tQMMCOmebDVzY8yUeKp2")))
+                && (Timestamp.now().compareTo(post.getExpirationTime()) <= 0))
+        {
+            holder.delete.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            holder.delete.setVisibility(View.GONE);
         }
 
         if (post.getId() == null || post.getId().isEmpty())
@@ -143,6 +134,24 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             intent.putExtra("creatorType", post.getCreatorType());
             context.startActivity(intent);
         });
+
+        holder.commentButton.setOnClickListener(v -> {
+            String postId = post.getId(); // Or post.getId(), depending on your model
+
+            // Get the hosting activity
+            AppCompatActivity activity = (AppCompatActivity) v.getContext();
+
+            // Create the fragment with postId
+            CommentsFragment commentsFragment = CommentsFragment.newInstance(postId);
+
+            // Open the fragment
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, commentsFragment) // Replace with your actual container ID
+                    .addToBackStack(null)
+                    .commit();
+        });
+
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference postRef = db.collection("posts").document(post.getId());
@@ -173,38 +182,42 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             });
         });
 
+        holder.delete.setOnClickListener(v -> {
+            AlertDialog dialog = new AlertDialog.Builder(context)
+                    .setMessage("Are you sure you want to delete this post?")
+                    .setPositiveButton("Delete", (dialogInterface, which) -> {
+                        DocumentReference postRefDel = db.collection("posts").document(post.getId());
 
+                        postRefDel.delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    int positionToRemove = holder.getAdapterPosition();
+                                    if (positionToRemove != RecyclerView.NO_POSITION) {
+                                        posts.remove(positionToRemove);
+                                        notifyItemRemoved(positionToRemove);
+                                    }
+                                    Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("FeedAdapter", "Failed to delete post: ", e);
+                                    Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show();
+                                });
+                    })
+                    .setNegativeButton("Cancel", (dialogInterface, which) -> {
+                        dialogInterface.dismiss();
+                    })
+                    .create();
 
-        holder.commentButton.setOnClickListener(v -> {
-            Log.d("FeedAdapter", "Context: " + context.getClass().getSimpleName());
+            dialog.setOnShowListener(dialogInterface -> {
+                // Set Delete button color to red
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
 
-            if (recyclerView != null && recyclerView.getLayoutManager() instanceof LinearLayoutManager)
-            {
-                int positionToScroll = holder.getAdapterPosition();
-                ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(positionToScroll, 0);
-            }
-            if (context instanceof AppCompatActivity)
-            {
-                AppCompatActivity activity = (AppCompatActivity) context;
+                // Set Cancel button color to black
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(context.getResources().getColor(android.R.color.black));
+            });
 
-                try
-                {
-                    CommentsFragment commentsFragment = CommentsFragment.newInstance(post.getId());
-                    activity.getSupportFragmentManager()
-                            .beginTransaction()
-                            .add(R.id.fragment_container, commentsFragment)
-                            .addToBackStack(null)
-                            .commit();
-                }
-                catch (Exception e)
-                {
-                    Log.e("FeedAdapter", "Error opening CommentsFragment: ", e);
-                }
-            }
-            else
-            {
-                Log.e("FeedAdapter", "Context is not an AppCompatActivity!");
-            }
+            dialog.show();
         });
 
         postRef.get().addOnCompleteListener(task -> {
@@ -284,6 +297,14 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         return posts.size();
     }
 
+    public void updatePosts(List<Post> newPosts)
+    {
+        this.posts.clear();
+        this.posts.addAll(newPosts);
+        notifyDataSetChanged();
+    }
+
+
     public void updateCommentCountForPost(String postId, int newCommentCount)
     {
         for (int i = 0; i < posts.size(); i++)
@@ -331,8 +352,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     static class FeedViewHolder extends RecyclerView.ViewHolder
     {
-        TextView creator, creatorType, created, expires, title, description, commentCount, likeCount, expired;
-        ImageButton commentButton, likeButton;
+        TextView creator, creatorType, created, expires, expired, title, description, commentCount, likeCount, category;
+        ImageButton commentButton, likeButton, delete;
         Button approve;
         public FeedViewHolder(@NonNull View itemView)
         {
@@ -347,7 +368,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             expired = itemView.findViewById(R.id.expired);
             likeCount = itemView.findViewById(R.id.like_count);
             commentButton = itemView.findViewById(R.id.comment_button);
+            category = itemView.findViewById(R.id.category);
             likeButton = itemView.findViewById(R.id.like_button);
+            delete = itemView.findViewById(R.id.delete);
             approve = itemView.findViewById(R.id.approve);
         }
     }

@@ -12,7 +12,9 @@
     <color name="nav_bar_background">#FFFFFF</color>
     <color name="red">#E0474B</color>
     <color name="handson">#E966CE8C</color>
-
+    <color name="colorPrimary">#E966CE8C</color>
+    <color name="har">#3c3c3c</color>
+    <color name="har1">#787878</color>
     <color name="button_primary">#FF3D71</color>
     <color name="button_secondary">#5A5A5A</color>
     <color name="handson_secondary">#A9CBB7</color>

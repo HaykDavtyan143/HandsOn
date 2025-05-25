@@ -3,12 +3,14 @@ package com.haykdavtyan.handson;
 import com.google.firebase.firestore.PropertyName;
 import java.util.HashMap;
 
-public class User {
+public class User
+{
     private String id;
     private String email;
     private String password;
     private String username;
     private String accType;
+    private String Bio;
 
     private HashMap<String, String> followers = new HashMap<>();
     private HashMap<String, String> following = new HashMap<>();
@@ -25,11 +27,12 @@ public class User {
         this.following = new HashMap<>();
     }
 
-    public User(String email, String id, String username, String accType, String password)
+    public User(String email, String id, String username, String Bio, String accType, String password)
     {
         this.email = email;
         this.id = id;
         this.username = username;
+        this.Bio = Bio;
         this.accType = accType;
         this.password = password;
         this.followers = new HashMap<>();
@@ -73,6 +76,16 @@ public class User {
     public HashMap<String, String> getFollowing()
     {
         return following;
+    }
+
+    public String getBio()
+    {
+        return Bio;
+    }
+
+    public void setBio(String bio)
+    {
+        Bio = bio;
     }
 
     public void setId(String id)

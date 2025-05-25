@@ -213,7 +213,7 @@ public class SignupActivity extends AppCompatActivity
                                                     accType = "Organization";
                                                 }
 
-                                                User newUser = new User(email, userId, username, accType, password);
+                                                User newUser = new User(email, userId, username, "No bio yet", accType, password);
                                                 FirebaseFirestore.getInstance()
                                                         .collection("users")
                                                         .document(userId)

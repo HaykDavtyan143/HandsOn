@@ -19,6 +19,8 @@ public class Post
     private HashMap<String, Object> likedBy;
     private int commentsCount;
 
+    private String category;
+
     private boolean isLiked = false;
 
     private int likes = 0;
@@ -123,6 +125,14 @@ public class Post
 
     public boolean isApproved() {
         return approved;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public void setApproved(boolean approved) {

@@ -26,18 +26,17 @@
         android:layout_marginTop="4dp" />
 
     <ImageButton
-        android:id="@+id/edit"
+        android:id="@+id/settings_button"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginTop="5dp"
         android:padding="1dp"
         android:scaleType="fitCenter"
-        android:layout_marginLeft="15dp"
-        android:src="@drawable/edit"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/ic_settings"
         android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="@+id/username"
         app:layout_constraintBottom_toBottomOf="@+id/username"
-        app:layout_constraintStart_toEndOf="@id/username"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/countsCard"

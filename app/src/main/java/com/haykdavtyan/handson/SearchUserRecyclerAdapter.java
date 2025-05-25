@@ -187,8 +187,8 @@ public class SearchUserRecyclerAdapter extends FirestoreRecyclerAdapter<User, Se
     }
 
     class UserViewHolder extends RecyclerView.ViewHolder {
-        Button username, follow;
-        TextView accType;
+        Button follow;
+        TextView username, accType;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);

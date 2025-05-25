@@ -1,0 +1,232 @@
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/filter_card"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    app:cardElevation="8dp"
+    app:cardCornerRadius="36dp"
+    app:cardBackgroundColor="@android:color/transparent"
+    android:padding="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/popup_background"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:id="@+id/filter_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Your filter UI here -->
+
+            <!-- Sort By -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sort By"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp" />
+
+            <RadioGroup
+                android:id="@+id/sort_group"
+                app:backgroundTint="@color/handson"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/sort_newest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonTint="@color/handson"
+                    android:text="Newest" />
+
+                <RadioButton
+                    android:id="@+id/sort_oldest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonTint="@color/handson"
+                    android:text="Oldest" />
+
+                <RadioButton
+                    android:id="@+id/sort_best"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonTint="@color/handson"
+                    android:text="Most Liked" />
+            </RadioGroup>
+
+            <!-- Creator Type -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter by Creator Type"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp" />
+
+            <RadioGroup
+                android:id="@+id/type_group"
+                app:backgroundTint="@color/handson"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/type_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonTint="@color/handson"
+                    android:text="All" />
+
+                <RadioButton
+                    android:id="@+id/type_volunteer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonTint="@color/handson"
+                    android:text="Volunteer" />
+
+                <RadioButton
+                    android:id="@+id/type_organization"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonTint="@color/handson"
+                    android:text="Organization" />
+            </RadioGroup>
+
+            <!-- Filter by Category -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter by Category"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp" />
+
+            <RadioGroup
+                android:id="@+id/category_group"
+                app:backgroundTint="@color/handson"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/category_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonTint="@color/handson"
+                    android:text="All" />
+
+                <RadioButton
+                    android:id="@+id/category_environment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Environment"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_education"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Education"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_health"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Health"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_animal_welfare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Animal Welfare"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_community"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Community"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_arts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Arts and Culture"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_sports"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sports"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_technology"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Technology"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_human_rights"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Human Rights"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_disaster"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Disaster Relief"
+                    app:buttonTint="@color/handson" />
+
+                <RadioButton
+                    android:id="@+id/category_recommendation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Suggestion"
+                    app:buttonTint="@color/handson" />
+            </RadioGroup>
+    </LinearLayout>
+</ScrollView>
+
+<Button
+    android:id="@+id/confirm_button"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Confirm"
+    android:textAllCaps="false"
+    android:layout_marginTop="16dp"
+    android:background="@drawable/bg_button"
+    app:backgroundTint="@color/handson"
+    android:textColor="@android:color/white" />
+
+</LinearLayout>
+
+    </androidx.cardview.widget.CardView>

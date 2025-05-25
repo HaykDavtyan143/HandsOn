@@ -149,11 +149,13 @@ public class LoginActivity extends AppCompatActivity
                     {
                         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                        currUser = new User (testEmail, currentUser.getUid(), testPassword, "Volunteer", "forhandsOn1");
-                        Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-                        Log.d("Login", "Guest logged in");
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        finish();
+                        fetchCurrentBio(bio -> {
+                            currUser = new User (testEmail, currentUser.getUid(), "John Doe", bio, "Volunteer", testPassword);
+                            Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                            Log.d("Login", "Guest logged in");
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
+                        });
                     }
                     else
                     {
@@ -186,7 +188,9 @@ public class LoginActivity extends AppCompatActivity
 
                             fetchCurrentUsername(username -> {
                                 fetchCurrentAccType(type -> {
-                                    currUser = new User (email, currentUser.getUid(), username, type, password);
+                                    fetchCurrentBio(bio -> {
+                                        currUser = new User (email, currentUser.getUid(), username, bio,  type, password);
+                                    });
                                 });
                             });
 
@@ -266,7 +270,38 @@ public class LoginActivity extends AppCompatActivity
             callback.onUsernameRetrieved(null);
         }
     }
+
+    private void fetchCurrentBio(BioCallback callback)
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null)
+        {
+            String uid = user.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference userRef = db.collection("users").document(uid);
+
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists())
+                {
+                    DocumentSnapshot document = task.getResult();
+                    String fetchedBio = document.getString("Bio");
+                    callback.onBioRetrieved(fetchedBio);
+                }
+                else
+                {
+                    callback.onBioRetrieved(null);
+                }
+            });
+        }
+        else
+        {
+            callback.onBioRetrieved(null);
+        }
+    }
+
 }
+
 interface AccTypeCallback
 {
     void onAccTypeRetrieved(String username);
@@ -275,5 +310,11 @@ interface UsernameCallback
 {
     void onUsernameRetrieved(String username);
 }
+
+interface BioCallback
+{
+    void onBioRetrieved(String bio);
+}
+
 
 

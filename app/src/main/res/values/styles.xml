@@ -3,5 +3,13 @@
         <item name="colorAccent">@color/handson</item>
         <item name="colorPrimary">@color/handson</item>
         <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Set positive and negative button text color -->
+        <item name="android:buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
+    </style>
+
+    <style name="DialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/handson</item>
     </style>
 </resources>
