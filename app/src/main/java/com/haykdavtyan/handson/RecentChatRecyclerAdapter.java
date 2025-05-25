@@ -63,7 +63,7 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<Chatroom
                 {
                     if (model.getLastMessageSenderId().equals(currentUser.getUid()))
                     {
-                        holder.lastMessageText.setText("You:" + model.getLastMessage());
+                        holder.lastMessageText.setText("You: " + model.getLastMessage());
                     }
                     else
                     {
