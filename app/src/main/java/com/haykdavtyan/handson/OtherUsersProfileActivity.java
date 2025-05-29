@@ -204,6 +204,7 @@ public class OtherUsersProfileActivity extends AppCompatActivity {
                                 post.setCreatorId(document.getString("creatorID"));
                                 post.setCreatorType(document.getString("creatorType"));
                                 post.setApproved((document.getBoolean("approved")));
+                                post.setCategory(document.getString("Category"));
                                 post.setCreationTime(document.getTimestamp("creationTime"));
                                 post.setExpirationTime(document.getTimestamp("expirationTime"));
 

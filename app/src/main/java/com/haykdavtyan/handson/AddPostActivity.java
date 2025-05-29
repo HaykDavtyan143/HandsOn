@@ -71,7 +71,7 @@ public class AddPostActivity extends AppCompatActivity
             if (child instanceof RadioButton) {
                 RadioButton rb = (RadioButton) child;
                 rb.setOnClickListener(v -> {
-                    // Uncheck all other RadioButtons
+
                     for (int j = 0; j < childCount; j++) {
                         View otherChild = gridLayout.getChildAt(j);
                         if (otherChild instanceof RadioButton && otherChild != v) {
@@ -161,6 +161,11 @@ public class AddPostActivity extends AppCompatActivity
 
         if (category == null) {
             Toast.makeText(this, "Please select a post category", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (expirationTimestamp == null) {
+            Toast.makeText(this, "Please select an expiration date", Toast.LENGTH_SHORT).show();
             return;
         }
 

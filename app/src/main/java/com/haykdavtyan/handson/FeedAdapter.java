@@ -105,8 +105,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             holder.expired.setVisibility(View.VISIBLE);
         }
 
-        if ((FirebaseAuth.getInstance().getCurrentUser().getUid().equals("fwRn6dA7tQMMCOmebDVzY8yUeKp2")) &&
-                (Timestamp.now().compareTo(post.getExpirationTime()) <= 0))
+        if ((FirebaseAuth.getInstance().getCurrentUser().getUid().equals("fwRn6dA7tQMMCOmebDVzY8yUeKp2")))
         {
             holder.approve.setVisibility(View.VISIBLE);
             holder.delete.setVisibility(View.VISIBLE);
@@ -116,9 +115,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             holder.approve.setVisibility(View.GONE);
         }
 
-        if (((FirebaseAuth.getInstance().getCurrentUser().getUid().equals(post.getCreatorId()))
+        if ((FirebaseAuth.getInstance().getCurrentUser().getUid().equals(post.getCreatorId()))
                 || (FirebaseAuth.getInstance().getCurrentUser().getUid().equals("fwRn6dA7tQMMCOmebDVzY8yUeKp2")))
-                && (Timestamp.now().compareTo(post.getExpirationTime()) <= 0))
         {
             holder.delete.setVisibility(View.VISIBLE);
         }
@@ -222,25 +220,28 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                     String text = holder.commentInput.getText().toString().trim();
                     if (text.isEmpty()) return;
 
-                    String key = String.valueOf(System.currentTimeMillis());
-                    Map<String,Object> commentData = new HashMap<>();
-                    commentData.put("text", text);
-                    commentData.put("creator", post.getCreator());  // you may need to pass this to the adapter
-                    commentData.put("creatorId", currentUserId);
-                    commentData.put("creatorType", String.valueOf(post.getCreatorType())); // same, pass this in or re-fetch
-                    commentData.put("likes", 0L);
-                    commentData.put("likedBy", new HashMap<String, Boolean>());
+                    fetchCurrentUsername(username -> {
+                        String key = String.valueOf(System.currentTimeMillis());
+                        Map<String,Object> commentData = new HashMap<>();
+                        commentData.put("text", text);
+                        commentData.put("creator", username);  // you may need to pass this to the adapter
+                        commentData.put("creatorId", currentUserId);
+                        commentData.put("creatorType", String.valueOf(post.getCreatorType())); // same, pass this in or re-fetch
+                        commentData.put("likes", 0L);
+                        commentData.put("likedBy", new HashMap<String, Boolean>());
 
-                    db.collection("posts").document(postId)
-                            .update("comments." + key, commentData)
-                            .addOnSuccessListener(a -> {
-                                commentsMap.put(key, commentData);
-                                commentKeys.clear();
-                                commentKeys.addAll(commentsMap.keySet());
-                                commentsAdapter.notifyDataSetChanged();
-                                holder.commentsRecyclerView.scrollToPosition(commentKeys.size() - 1);
-                                holder.commentInput.setText("");
-                            });
+                        db.collection("posts").document(postId)
+                                .update("comments." + key, commentData)
+                                .addOnSuccessListener(a -> {
+                                    commentsMap.put(key, commentData);
+                                    commentKeys.clear();
+                                    commentKeys.addAll(commentsMap.keySet());
+                                    commentsAdapter.notifyDataSetChanged();
+                                    holder.commentsRecyclerView.scrollToPosition(commentKeys.size() - 1);
+                                    holder.commentInput.setText("");
+                                });
+                    });
+
                 });
             }
         });
@@ -488,7 +489,38 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         this.recyclerView = recyclerView;
     }
 
+
+    private void fetchCurrentUsername(AccTypeCallback callback)
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null)
+        {
+            String uid = user.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference userRef = db.collection("users").document(uid);
+
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists())
+                {
+                    DocumentSnapshot document = task.getResult();
+                    String username = document.getString("Username");
+                    callback.onAccTypeRetrieved(username);
+                }
+                else
+                {
+                    callback.onAccTypeRetrieved(null);
+                }
+            });
+        }
+        else
+        {
+            callback.onAccTypeRetrieved(null);
+        }
+    }
 }
+
+
 interface CommentCountCallback
 {
     void onCommentCountFetched(int count);

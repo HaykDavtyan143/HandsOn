@@ -140,6 +140,13 @@ public class SearchActivity extends AppCompatActivity
                     Post post = doc.toObject(Post.class);
                     if (post != null) {
                         post.setId(doc.getId());
+                        post.setCreator(doc.getString("creator"));
+                        post.setCreatorId(doc.getString("creatorID"));
+                        post.setCreatorType(doc.getString("creatorType"));
+                        post.setApproved((doc.getBoolean("approved")));
+                        post.setCategory(doc.getString("Category"));
+                        post.setCreationTime(doc.getTimestamp("creationTime"));
+                        post.setExpirationTime(doc.getTimestamp("expirationTime"));
                         allPosts.add(post);
                     }
                 }
